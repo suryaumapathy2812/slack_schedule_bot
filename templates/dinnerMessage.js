@@ -45,7 +45,7 @@ const dinnerMessageTemplate = (list) => {
             "type": "section",
             "text": {
                 "type": "plain_text",
-                "text": "\n"
+                "text": "\n  "
             }
         },
         {
@@ -59,7 +59,7 @@ const dinnerMessageTemplate = (list) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": `*Yes (${yesList.length}) *  \n  ${mdYesList}`
+                "text": '*Yes*'
             },
             "accessory": {
                 "type": "button",
@@ -75,7 +75,7 @@ const dinnerMessageTemplate = (list) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": `*No (${noList.length}) * \n  ${mdNoList}`
+                "text": '*No*'
             },
             "accessory": {
                 "type": "button",

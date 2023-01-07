@@ -1,7 +1,14 @@
 const { WebClient, LogLevel } = require('@slack/web-api');
 const Poll = require('../model/poll');
+const SlackMessage = require('../templates/slackMessage');
+const { templates } = require("../templates/templates");
+
+
 
 // Replace the placeholders with your Slack bot's access token and the channel ID
+
+const slackMessage = new SlackMessage();
+
 
 const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN, {
     logLevel: LogLevel.DEBUG
@@ -10,40 +17,28 @@ const web = new WebClient(process.env.BOT_USER_OAUTH_TOKEN, {
 async function sampleMessage() {
     // Call the chat.postMessage method using the WebClient
     try {
-        const res = await web.chat.postMessage({
-            channel: process.env.DEFAULT_CHANNEL,
-            text: 'Hello, world!'
-        })
-        console.log('Message sent: ', res.ts);
-
+        await slackMessage.sampleMessage();
     } catch (error) {
         console.log(error)
     }
 }
-
-
 
 async function scheduledMessage() {
     const timeInSeconds = 60; // time in seconds from now
 
     try {
-        const res = await web.chat.scheduleMessage({
-            channel: process.env.DEFAULT_CHANNEL,
-            // userId: userId,
-            text: 'This is a scheduled message. Initiated at ' + Date.now(),
-            post_at: Math.floor(Date.now() / 1000) + timeInSeconds
-        })
-        console.log('Scheduled message sent: ', res.scheduled_message_id);
+        await slackMessage.scheduleMessage(
+            process.env.DEFAULT_CHANNEL,
+            Math.floor(Date.now() / 1000) + timeInSeconds,
+            'This is a scheduled message. Initiated at ' + Date.now()
+        )
     } catch (error) {
         console.log(error)
     }
 }
 
-
-
-
-function scheduledMessageList() {
-    web.chat.scheduledMessages.list({ channel: process.env.DEFAULT_CHANNEL })
+async function scheduledMessageList() {
+    await web.chat.scheduledMessages.list({ channel: process.env.DEFAULT_CHANNEL })
         .then((res) => {
             for (const message of res.scheduled_messages) {
                 console.log(message);
@@ -51,37 +46,39 @@ function scheduledMessageList() {
         }).catch(console.error);
 }
 
-
-
 async function customMessage(channelId, message) {
     // Call the chat.postMessage method using the WebClient
     try {
-        const res = await web.chat.postMessage({
-            channel: channelId ?? process.env.DEFAULT_CHANNEL,
-            text: message ?? "Someone tried @Zork"
-        })
-        console.log('Message sent: ', res.ts);
+
+        await slackMessage.sendMessage(
+            channelId ?? process.env.DEFAULT_CHANNEL,
+            message ?? "Someone tried using @Zork"
+        );
+
     } catch (error) {
         console.log(error)
     }
 }
 
+async function customTemplateMessages(channelId, messageTemplate) {
 
-const { templates } = require("../templates/templates");
-const { dinnerMessageTemplate } = require('../templates/dinnerMessage');
+    try {
 
-function customTemplateMessages(channelId, messageTemplate) {
-    web.chat.postMessage({
-        channel: channelId,
-        blocks: templates.dinnerMessageTemplate()
-    }).then((res) => {
-        console.log('Message sent: ', res.ts);
-    }).catch(console.error);
+        await slackMessage.sendRichMessage(channelId, messageTemplate);
+
+        // const res = await web.chat.postMessage({
+        //     channel: channelId,
+        //     blocks: templates.dinnerMessageTemplate()
+        // })
+
+        // console.log('Message sent: ', res.ts);
+
+    } catch (error) {
+        console.log(error)
+    }
+
+
 }
-
-
-
-
 
 async function updateSimpleMessage({ channelId, ts, userId, username, userResponse }) {
     try {
@@ -124,7 +121,7 @@ async function updateSimpleMessage({ channelId, ts, userId, username, userRespon
         const responseList = await Poll.find({ channelId, messageId: ts, userId });
         console.log("Data retrieved", responseList);
 
-        const newDinnerMessageTemplate = dinnerMessageTemplate(responseList)
+        const newDinnerMessageTemplate = templates.dinnerMessageTemplate(responseList)
 
         const res = await web.chat.update({
             channel: channelId,

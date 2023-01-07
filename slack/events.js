@@ -1,4 +1,5 @@
 const { createEventAdapter } = require("@slack/events-api");
+const { messagePatternRecognize } = require("../common/utils");
 const { sampleMessage, customMessage, customTemplateMessages } = require("./../connection/webApi")
 
 const slack_events = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
@@ -16,9 +17,14 @@ slack_events.on('app_home_opened', async (event) => {
 slack_events.on("app_mention", async (event) => {
     console.log(`Received an app_mention event from user ${event.user} in channel ${event.channel}`);
     console.log(event)
-    // customMessage(process.env.DEFAULT_CHANNEL, `Hi there ${event.user}, What can I do for you today?`)
-    customTemplateMessages(process.env.DEFAULT_CHANNEL, "dinnerMessageTemplate")
-    // await say(`Hi there ${event.user}, What can I do for you today`)
+
+    const { channel: fromChannel, text: message } = event
+    const { channel: toChannel, template: templateName } = messagePatternRecognize(message);
+
+    console.log("toChannel", typeof toChannel, toChannel);
+    console.log("templateId", typeof templateName, templateName);
+
+    await customTemplateMessages(toChannel ?? process.env.DEFAULT_CHANNEL, templateName)
 })
 
 
