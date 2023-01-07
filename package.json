@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rimraf dist",
     "prestart": "npm run build",
-    "start": "node ./src/index.js",
-    "dev": "nodemon -q src/index.js"
+    "start": "node ./index.js",
+    "dev": "nodemon -q index.js"
   },
   "keywords": [],
   "author": "",
