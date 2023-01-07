@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "name": "schedule_bot_v2",
     "builds": [
         {
             "src": "./src/index.js",

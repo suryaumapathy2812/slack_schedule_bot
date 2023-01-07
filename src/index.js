@@ -30,6 +30,10 @@ const connectionString = process.env.ATLAS_URI;
             console.log(`app is running on port ${port}!`)
         })
 
+        app.get("/", (req, res) => {
+            res.send("Server is working")
+        })
+
         app.use("/start", (req, res) => {
             res.send("Server is working")
         })
