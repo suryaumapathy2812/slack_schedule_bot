@@ -1,27 +1,34 @@
 const dinnerMessageTemplate = (list) => {
 
-    console.log("list ==========", list)
+    let yesList = [];
+    let mdYesList = "";
+    let noList = [];
+    let mdNoList = "";
 
-    const yesList = list
-        .filter((option) => option["userResponse"] === "yes")
-        .map((option) => {
-            return option["username"]
-        });
+    if (list) {
+        console.log("list ==========", list)
 
-    const mdYesList = yesList
-        .toString()
-        .replace(",", ", @");
+        yesList = list
+            .filter((option) => option["userResponse"] === "yes")
+            .map((option) => {
+                return "@" + option["username"]
+            });
+
+        mdYesList = yesList
+            .toString()
+            .replace(",", ", @");
 
 
-    const noList = list
-        .filter((option) => option["userResponse"] === "no")
-        .map((option) => {
-            return option["username"]
-        });
+        noList = list
+            .filter((option) => option["userResponse"] === "no")
+            .map((option) => {
+                return "@" + option["username"]
+            });
 
-    const mdNoList = noList
-        .toString()
-        .replace(",", ", @");
+        mdNoList = noList
+            .toString()
+            .replace(",", ", @");
+    }
 
     console.log("mdYesList ===========", mdYesList);
     console.log("mdNoList ==========", mdNoList)

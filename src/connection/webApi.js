@@ -1,6 +1,5 @@
 const { WebClient, LogLevel } = require('@slack/web-api');
 const Poll = require('../model/poll');
-const { dinnerMessageTemplate } = require('../templates/dinnerMessage');
 
 // Replace the placeholders with your Slack bot's access token and the channel ID
 
@@ -68,12 +67,13 @@ async function customMessage(channelId, message) {
 }
 
 
-const { templates } = require("./../templates/templates")
+const { templates } = require("../templates/templates");
+const { dinnerMessageTemplate } = require('../templates/dinnerMessage');
 
 function customTemplateMessages(channelId, messageTemplate) {
     web.chat.postMessage({
         channel: channelId,
-        blocks: templates[messageTemplate]
+        blocks: templates.dinnerMessageTemplate()
     }).then((res) => {
         console.log('Message sent: ', res.ts);
     }).catch(console.error);
@@ -121,7 +121,7 @@ async function updateSimpleMessage({ channelId, ts, userId, username, userRespon
             console.log("updateResponse", updateResponse)
         }
 
-        const responseList = await Poll.find();
+        const responseList = await Poll.find({ channelId, messageId: ts, userId });
         console.log("Data retrieved", responseList);
 
         const newDinnerMessageTemplate = dinnerMessageTemplate(responseList)

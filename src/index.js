@@ -6,16 +6,11 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config()
 }
 
-
 const eventsApp = require("./slack/events")
 const interactionApp = require("./slack/interaction")
 
-// const { LogLevel } = require('@slack/web-api');
-// const { eventsClient } = require("./connection/eventsApi")
-// const { socketModeClient } = require("./connection/socketMode")
-
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const connectionString = process.env.ATLAS_URI;
 
 
