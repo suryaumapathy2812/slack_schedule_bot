@@ -1,6 +1,7 @@
 
 const express = require("express")
 const mongoose = require("mongoose")
+const bodyParser = require("body-parser")
 
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config()
@@ -8,8 +9,12 @@ if (process.env.NODE_ENV !== "production") {
 
 const eventsApp = require("./slack/events")
 const interactionApp = require("./slack/interaction")
+const commandRoutes = require("./slack/commands")
+
 
 const app = express();
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 const port = process.env.PORT || 3000;
 const connectionString = process.env.ATLAS_URI;
 
@@ -26,10 +31,6 @@ const connectionString = process.env.ATLAS_URI;
         eventsApp.listenForEvents(app);
         interactionApp.listenForInteraction(app);
 
-        await app.listen(port, function () {
-            console.log(`app is running on port ${port}!`)
-        })
-
         app.get("/", (req, res) => {
             res.send("Server is working")
         })
@@ -38,7 +39,15 @@ const connectionString = process.env.ATLAS_URI;
             res.send("Server is working")
         })
 
+        app.use("/slack/command/", [bodyParser.json(), bodyParser.urlencoded({ extended: true })], commandRoutes)
+
+        await app.listen(port, function () {
+            console.log(`app is running on port ${port}!`)
+        })
+
     } catch (error) {
         console.log(error)
     }
 })();
+
+module.exports = { app }
