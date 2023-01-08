@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { updateMessageTemplate } = require("../common/utils");
+const SlackMessage = require("../templates/slackMessage");
 const Schema = mongoose.Schema;
 
 
@@ -26,4 +28,7 @@ const pollSchema = new Schema({
 }, { timestamps: true })
 
 const Poll = mongoose.model('Poll', pollSchema);
+
+
+
 module.exports = Poll;

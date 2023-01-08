@@ -64,14 +64,8 @@ async function customTemplateMessages(channelId, messageTemplate) {
 
     try {
 
-        await slackMessage.sendRichMessage(channelId, messageTemplate);
-
-        // const res = await web.chat.postMessage({
-        //     channel: channelId,
-        //     blocks: templates.dinnerMessageTemplate()
-        // })
-
-        // console.log('Message sent: ', res.ts);
+        const res = await slackMessage.sendRichMessage(channelId, messageTemplate);
+        // return res;
 
     } catch (error) {
         console.log(error)

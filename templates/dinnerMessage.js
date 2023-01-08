@@ -59,7 +59,7 @@ const dinnerMessageTemplate = (list) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": '*Yes*'
+                "text": "*Yes*  $$input_1"
             },
             "accessory": {
                 "type": "button",
@@ -75,7 +75,7 @@ const dinnerMessageTemplate = (list) => {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": '*No*'
+                "text": "*No*  $$input_2"
             },
             "accessory": {
                 "type": "button",

@@ -1,5 +1,6 @@
 const { WebClient } = require("@slack/client");
 const { LogLevel } = require("@slack/web-api");
+const { updateMessageTemplate } = require("../common/utils");
 const MessageTemplate = require("../model/messageTemplate");
 
 
@@ -80,7 +81,9 @@ class SlackMessage {
             console.log("MessageTemplate.findOne success ====================")
             console.log(messageBlock)
 
-            const block = JSON.parse(messageBlock.block)
+
+            const block = updateMessageTemplate(messageBlock.block);
+            // const block = JSON.parse(messageBlock.block)
             console.log("block ===================")
             console.log(typeof block)
 
@@ -89,16 +92,19 @@ class SlackMessage {
                 blocks: block
             })
             console.log("SlackMessage.sendRichMessage() success ====================")
-            console.log(res.ts);
+            console.log(res);
+
+            return { status: "success", res, templateId: messageBlock.templateId };
 
         } catch (error) {
             console.log("SlackMessage.sendRichMessage() failed ====================")
             console.log(error)
+            return { status: "failed" }
         }
     }
 
 
-    async updateRichMessage(channelId, templateName) {
+    async updateRichMessage(channelId, templateName, ts, { userId, username, userResponse }) {
         try {
 
             const messageBlock = await MessageTemplate.findOne({ templateName })
@@ -106,10 +112,14 @@ class SlackMessage {
             console.log("MessageTemplate.findOne() success ====================")
             console.log(messageBlock)
 
+            const block = updateMessageTemplate(messageBlock.block);
+            console.log("block ===================")
+            console.log(typeof block)
+
             const res = await this.web.chat.update({
                 channel: channelId,
                 ts: ts,
-                blocks: JSON.parse(messageBlock)
+                blocks: block
             })
 
             console.log("SlackMessage.updateRichMessage() success ====================")
