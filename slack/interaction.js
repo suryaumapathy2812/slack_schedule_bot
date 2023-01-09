@@ -23,10 +23,10 @@ slackInteraction.action({ type: 'button' }, async (payload, response) => {
         const username = payload.user.username;
         const userResponse = payload.actions[0].value;
 
-
         console.log(channelId, ts, userId, username, userResponse);
 
         const pollMessageHistory = await PollMessageHistory.findOne({ channelId, ts });
+
         const { templateId } = pollMessageHistory;
 
         await new PollMessage().updateMessage(channelId, templateId, ts, { userId, username, userResponse })
