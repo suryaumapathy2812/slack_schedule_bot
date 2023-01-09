@@ -23,6 +23,7 @@
     "dotenv": "^16.0.3",
     "mongodb": "^4.13.0",
     "mongoose": "^6.8.2",
+    "node-schedule": "^2.1.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

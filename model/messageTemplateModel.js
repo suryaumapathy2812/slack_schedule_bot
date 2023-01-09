@@ -1,21 +1,20 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-
-const pollMessageHistory = new Schema({
+const messageTemplateSchema = new Schema({
     templateId: {
         type: String,
         required: true
     },
-    channelId: {
+    templateName: {
         type: String,
         required: true
     },
-    ts: {
-        type: Number,
+    block: {
+        type: String,
         required: true
-    }
+    },
 }, { timestamps: true })
 
-const PollMessageHistory = mongoose.model('PollMessageHistory', pollMessageHistory);
-module.exports = PollMessageHistory
+const MessageTemplateModel = mongoose.model('MessageTemplate', messageTemplateSchema);
+module.exports = MessageTemplateModel;

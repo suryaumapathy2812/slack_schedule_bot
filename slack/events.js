@@ -1,6 +1,6 @@
 const { createEventAdapter } = require("@slack/events-api");
 const { messagePatternRecognize } = require("../common/utils");
-const PollMessage = require("../templates/pollMessage");
+const PollMessageModel = require("../templates/pollMessage");
 const SlackMessage = require("../templates/slackMessage");
 const { sampleMessage, customMessage, customTemplateMessages } = require("./../connection/webApi")
 
@@ -32,7 +32,7 @@ slack_events.on("app_mention", async (event) => {
         // await customTemplateMessages(toChannel ?? process.env.DEFAULT_CHANNEL, templateName)
 
         //  !  send messagePoll
-        const pollMessage = new PollMessage().createMessage(toChannel, templateName)
+        const pollMessage = new PollMessageModel().createMessage(toChannel, templateName)
 
     }
 
