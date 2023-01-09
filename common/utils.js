@@ -35,13 +35,15 @@ const updateMessageTemplate = (message, dataArray) => {
 
     let updatedMessage = message;
 
-    for (let index = 0; index < patternMatch.length; index++) {
+    if (patternMatch) {
+        for (let index = 0; index < patternMatch.length; index++) {
 
-        const matchString = patternMatch[index];
-        const replacementString = dataArray[index] !== undefined ? dataArray[index] : "";
-        console.log(index, matchString, replacementString)
-        updatedMessage = updatedMessage.replace(matchString, replacementString);
+            const matchString = patternMatch[index];
+            const replacementString = dataArray[index] !== undefined ? dataArray[index] : "";
+            console.log(index, matchString, replacementString)
+            updatedMessage = updatedMessage.replace(matchString, replacementString);
 
+        }
     }
 
     console.log(updatedMessage)
