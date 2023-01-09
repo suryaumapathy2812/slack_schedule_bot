@@ -1,6 +1,6 @@
 const { createMessageAdapter } = require("@slack/interactive-messages");
-const PollMessageHistory = require("../model/pollMessageHistory");
-const PollMessage = require("../templates/pollMessage");
+const PollMessageHistoryModel = require("../model/pollMessageHistoryModel");
+const PollMessageModel = require("../templates/pollMessage");
 
 const slackInteraction = createMessageAdapter(process.env.SLACK_SIGNING_SECRET);
 
@@ -25,11 +25,11 @@ slackInteraction.action({ type: 'button' }, async (payload, response) => {
 
         console.log(channelId, ts, userId, username, userResponse);
 
-        const pollMessageHistory = await PollMessageHistory.findOne({ channelId, ts });
+        const pollMessageHistory = await PollMessageHistoryModel.findOne({ channelId, ts });
 
         const { templateId } = pollMessageHistory;
 
-        await new PollMessage().updateMessage(channelId, templateId, ts, { userId, username, userResponse })
+        await new PollMessageModel().updateMessage(channelId, templateId, ts, { userId, username, userResponse })
 
         // await updateSimpleMessage({ channelId, ts, userId, username, userResponse })
         console.log("Message has been updated")

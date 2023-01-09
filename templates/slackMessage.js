@@ -1,7 +1,7 @@
 const { WebClient } = require("@slack/client");
 const { LogLevel } = require("@slack/web-api");
 const { updateMessageTemplate } = require("../common/utils");
-const MessageTemplate = require("../model/messageTemplate");
+const MessageTemplate = require("../model/messageTemplateModel");
 
 
 class SlackMessage {

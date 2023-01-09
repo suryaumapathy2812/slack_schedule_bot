@@ -1,4 +1,6 @@
+const schedule = require('node-schedule');
 const { v4: uuidv4 } = require('uuid');
+
 
 const updatePattern = /\$\$[a-z]{1,10}[-_][0-9]{1,2}/gi
 
@@ -59,9 +61,12 @@ var groupBy = function (xs, key) {
     }, {});
 };
 
+
 module.exports = {
     generateMessageId,
     messagePatternRecognize,
     updateMessageTemplate,
     groupBy
 }
+
+

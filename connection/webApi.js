@@ -1,12 +1,9 @@
 const { WebClient, LogLevel } = require('@slack/web-api');
-const Poll = require('../model/poll');
+const PollModel = require('../model/pollModel');
 const SlackMessage = require('../templates/slackMessage');
-const { templates } = require("../templates/templates");
-
 
 
 // Replace the placeholders with your Slack bot's access token and the channel ID
-
 const slackMessage = new SlackMessage();
 
 
@@ -78,13 +75,13 @@ async function updateSimpleMessage({ channelId, ts, userId, username, userRespon
     try {
         console.log("Before Updating Message ============================", channelId, ts, userId, username, userResponse)
 
-        const isExist = await Poll.findOne({ channelId, messageId: ts, userId });
+        const isExist = await PollModel.findOne({ channelId, messageId: ts, userId });
         console.log("Data isExist", isExist);
 
 
         if (!isExist) {
 
-            const poll = new Poll({
+            const poll = new PollModel({
                 channelId: channelId,
                 messageId: ts,
                 userId: userId,
@@ -98,7 +95,7 @@ async function updateSimpleMessage({ channelId, ts, userId, username, userRespon
         } else {
             console.log("isExist ========", isExist)
 
-            const updateResponse = await Poll.findOneAndUpdate({
+            const updateResponse = await PollModel.findOneAndUpdate({
                 channelId: isExist.channelId,
                 messageId: isExist.messageId,
                 userId: isExist.userId
@@ -112,7 +109,7 @@ async function updateSimpleMessage({ channelId, ts, userId, username, userRespon
             console.log("updateResponse", updateResponse)
         }
 
-        const responseList = await Poll.find({ channelId, messageId: ts, userId });
+        const responseList = await PollModel.find({ channelId, messageId: ts, userId });
         console.log("Data retrieved", responseList);
 
         const newDinnerMessageTemplate = templates.dinnerMessageTemplate(responseList)

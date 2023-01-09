@@ -1,8 +1,8 @@
 const express = require("express");
-const PollMessageHistory = require("../model/pollMessageHistory");
+const PollMessageHistoryModel = require("../model/pollMessageHistoryModel");
+const PollMessage = require("../templates/pollMessage");
 const SlackMessage = require("../templates/slackMessage");
 const commandRoutes = express.Router();
-
 
 commandRoutes.post("/dinner_message", async (req, res) => {
     try {
@@ -16,10 +16,24 @@ commandRoutes.post("/dinner_message", async (req, res) => {
 
         const { templateId, res: richMessageRes } = messageRes;
 
-        const pollMessageHistory = new PollMessageHistory({ channelId: channel_id, templateId, ts: richMessageRes.ts })
+        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
         const pollMessageHistoryResponse = await pollMessageHistory.save();
 
         console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
+
+
+        const schedule = require('node-schedule');
+        const dt = new Date();
+
+        const date = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes() + 30, dt.getSeconds());
+
+        const job = schedule.scheduleJob(date, function () {
+            console.log('The world is going to end today.');
+
+            const closePoll = new PollMessage().closeMessage(channel_id, templateId, richMessageRes.ts);
+
+        });
+
 
         res.send("Request Completed");
 
@@ -41,7 +55,7 @@ commandRoutes.post("/friday_feedback_b3a", async (req, res) => {
 
         const { templateId, res: richMessageRes } = messageRes;
 
-        const pollMessageHistory = new PollMessageHistory({ channelId: channel_id, templateId, ts: richMessageRes.ts })
+        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
         const pollMessageHistoryResponse = await pollMessageHistory.save();
 
         console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
@@ -66,7 +80,7 @@ commandRoutes.post("/friday_feedback_b3b", async (req, res) => {
 
         const { templateId, res: richMessageRes } = messageRes;
 
-        const pollMessageHistory = new PollMessageHistory({ channelId: channel_id, templateId, ts: richMessageRes.ts })
+        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
         const pollMessageHistoryResponse = await pollMessageHistory.save();
 
         console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
@@ -91,7 +105,7 @@ commandRoutes.post("/friday_feedback_b3c", async (req, res) => {
 
         const { templateId, res: richMessageRes } = messageRes;
 
-        const pollMessageHistory = new PollMessageHistory({ channelId: channel_id, templateId, ts: richMessageRes.ts })
+        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
         const pollMessageHistoryResponse = await pollMessageHistory.save();
 
         console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
