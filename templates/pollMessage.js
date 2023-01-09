@@ -1,5 +1,5 @@
 const { WebClient, LogLevel } = require("@slack/client");
-const { groupBy, updateMessageTemplate } = require("../common/utils");
+const { } = require("../common/utils");
 const MessageTemplate = require("../model/messageTemplate");
 const Poll = require("../model/poll");
 const PollMessageHistory = require("../model/pollMessageHistory");
@@ -20,8 +20,60 @@ class PollMessage {
         });
     }
 
+    async #createPoll({ channelId, ts, userId, username, userResponse }) {
+
+        try {
+            const poll = new Poll({
+                channelId: channelId,
+                messageId: ts,
+                userId: userId,
+                username: username,
+                userResponse: userResponse
+            })
+
+            const db_res = await poll.save();
+            console.log("Data recorded", db_res);
+
+            return db_res;
+
+        } catch (error) {
+            console.log(error);
+        }
+
+
+    }
+
+    async #findPoll({ channelId, messageId, userId }) {
+        const isExist = await Poll.findOne({ channelId, messageId, userId });
+        return isExist;
+    }
+
+    async #updatePoll(find, update, options) {
+
+        if (!options) options = {}
+
+        const updateOptions = Object.assign({ new: true }, options)
+
+        try {
+            const updateResponse = await Poll.findOneAndUpdate(
+                find,
+                update,
+                updateOptions
+            )
+            console.log("updateResponse", updateResponse)
+
+            return updateResponse
+
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+
     async createMessage(channelId, templateName) {
         try {
+
             const pollResponse = await this.slackMessage.sendRichMessage(channelId, templateName);
 
             if (pollResponse.status !== "success") {
@@ -48,35 +100,25 @@ class PollMessage {
     }
 
 
-
     async updateMessage(channelId, templateId, ts, { userId, username, userResponse }) {
         try {
 
             console.log("Before Updating Message ============================", channelId, ts, userId, username, userResponse)
 
-            const isExist = await Poll.findOne({ channelId, messageId: ts, userId });
+            const isExist = await this.#findPoll({ channelId, messageId: ts, userId })
             console.log("Data isExist", isExist);
 
             if (!isExist) {
                 console.log("Create new user poll response")
-
-                // create new user poll response
-                const poll = new Poll({
-                    channelId: channelId,
-                    messageId: ts,
-                    userId: userId,
-                    username: username,
-                    userResponse: userResponse
-                })
-
-                const db_res = await poll.save();
+                const db_res = await this.#createPoll({ channelId, ts, userId, username, userResponse });
                 console.log("Data recorded", db_res);
 
             } else {
                 console.log("Update existing user poll response")
 
                 // Update existing user poll response
-                const updateResponse = await Poll.findOneAndUpdate({
+
+                const updateResponse = await this.#updatePoll({
                     channelId: isExist.channelId,
                     messageId: isExist.messageId,
                     userId: isExist.userId
@@ -86,54 +128,52 @@ class PollMessage {
                     userId,
                     username,
                     userResponse
-                }, { new: true })
+                })
+
                 console.log("updateResponse", updateResponse)
             }
 
-            const responseList = await Poll.find({ channelId, messageId: ts, userId });
+            const responseList = await Poll.find({ channelId, messageId: ts });
             console.log("Data retrieved", responseList.length, responseList);
 
-            // * generate user data and messageBlock
-
+            // * Update Template Block  starts here ======================================================================
             let yesList = [];
-            let mdYesList = "";
             let noList = [];
-            let mdNoList = "";
 
             if (responseList) {
                 console.log("list ==========", responseList)
 
-                yesList = responseList
+                const _yesList = responseList
                     .filter((option) => option["userResponse"] === "yes")
                     .map((option) => {
                         return "@" + option["username"]
-                    });
+                    })
 
-                mdYesList = yesList
-                    .toString()
-                    .replace(",", ", @");
+                yesList = `*(${_yesList.length})*  ` + _yesList.toString();
 
+                console.log("yesList ===================================", yesList)
 
-                noList = responseList
+                const _noList = responseList
                     .filter((option) => option["userResponse"] === "no")
                     .map((option) => {
                         return "@" + option["username"]
-                    });
+                    })
 
-                mdNoList = noList
-                    .toString()
-                    .replace(",", ", @");
+                noList = `*(${_noList.length})*  ` + _noList.toString();
+
+                console.log("noList ===================================", noList)
             }
 
-            console.log("mdYesList ===========", mdYesList);
-            console.log("mdNoList ==========", mdNoList)
+            console.log("yesList ===========", yesList);
+            console.log("noList ==========", noList)
+            // * Update Template Block  ends here ======================================================================
 
 
             const messageBlock = await MessageTemplate.findOne({ templateId })
             console.log("MessageTemplate.findOne() success ====================")
             console.log(messageBlock)
 
-            let userList = [mdYesList, mdNoList];
+            let userList = [yesList, noList];
 
             console.log("userList ===========", userList)
 
@@ -170,6 +210,11 @@ class PollMessage {
         } catch (error) {
             console.log(error)
         }
+    }
+
+
+    async closeMessage() {
+
     }
 
 }
