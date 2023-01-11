@@ -1,5 +1,5 @@
 
-const express = require("express")
+import express, { Request, Response } from "express"
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 
@@ -7,14 +7,12 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config()
 }
 
-const eventsApp = require("./slack/events")
-const interactionApp = require("./slack/interaction")
 const commandRoutes = require("./slack/commands")
 
 
+import { slackEvents, slackInteraction } from "./new/connections/slackConn"
+
 const app = express();
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 const port = process.env.PORT || 3000;
 const connectionString = process.env.ATLAS_URI;
 
@@ -28,14 +26,15 @@ const connectionString = process.env.ATLAS_URI;
             useUnifiedTopology: true,
         })
 
-        eventsApp.listenForEvents(app);
-        interactionApp.listenForInteraction(app);
 
-        app.get("/", (req, res) => {
+        app.use("/slack/events", slackEvents.requestListener())
+        app.use('/slack/interactions', slackInteraction.requestListener())
+
+        app.get("/", (_req: Request, res: Response) => {
             res.send("Server is working")
         })
 
-        app.use("/start", (req, res) => {
+        app.use("/start", (_req, res) => {
             res.send("Server is working")
         })
 
