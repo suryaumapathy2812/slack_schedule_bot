@@ -2,6 +2,7 @@ const express = require("express");
 const PollMessageHistoryModel = require("../model/pollMessageHistoryModel");
 const PollMessage = require("../templates/pollMessage");
 const SlackMessage = require("../templates/slackMessage");
+const PollModel = require("./../model/pollModel")
 const commandRoutes = express.Router();
 
 commandRoutes.post("/dinner_message", async (req, res) => {
@@ -116,6 +117,21 @@ commandRoutes.post("/friday_feedback_b3c", async (req, res) => {
         console.log(error);
     }
 
+})
+
+commandRoutes.post("/close_poll", async (req, res) => {
+    try {
+        console.log(req.body);
+        const { channel_id } = req.body
+
+        const recentPoll = await PollModel.find({ channelId: channel_id }).sort({ _id: 1 }).limit(1);
+        console.log(recentPoll);
+
+        res.send("Request Completed close_poll");
+
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 

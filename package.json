@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clean": "rimraf dist",
-    "prestart": "npm run build",
+    "prestart": "npm install",
     "start": "node ./index.js",
     "dev": "nodemon -q index.js"
   },

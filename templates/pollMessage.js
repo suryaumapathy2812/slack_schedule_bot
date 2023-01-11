@@ -75,6 +75,28 @@ class PollMessage {
     }
 
 
+    async #disablePoll(channelId, templateId, ts) {
+        try {
+            const disabledPoll = await new PollMessageHistory().updatePollStatus(
+                {
+                    templateId: templateId,
+                    channelId: channelId,
+                    ts: ts
+                },
+                {
+                    active: false
+                }
+            )
+
+            console.log("Poll has be disabled successfully");
+            return { status: "success", res: disabledPoll.res }
+        } catch (error) {
+            console.log("Failed to disable Poll")
+            console.log(error)
+        }
+    }
+
+
     async createMessage(channelId, templateName) {
         try {
 
@@ -149,71 +171,7 @@ class PollMessage {
                     console.log("updateResponse", updateResponse)
                 }
 
-                const responseList = await PollModel.find({ channelId, messageId: ts });
-                console.log("Data retrieved", responseList.length, responseList);
-
-                // * Update Template Block  starts here ======================================================================
-                let yesList = [];
-                let noList = [];
-
-                if (responseList) {
-                    console.log("list ==========", responseList)
-
-                    const _yesList = responseList
-                        .filter((option) => option["userResponse"] === "yes")
-                        .map((option) => {
-                            return "@" + option["username"]
-                        })
-
-                    yesList = `*(${_yesList.length})*  ` + _yesList.toString();
-
-                    console.log("yesList ===================================", yesList)
-
-                    const _noList = responseList
-                        .filter((option) => option["userResponse"] === "no")
-                        .map((option) => {
-                            return "@" + option["username"]
-                        })
-
-                    noList = `*(${_noList.length})*  ` + _noList.toString();
-
-                    console.log("noList ===================================", noList)
-                }
-
-                console.log("yesList ===========", yesList);
-                console.log("noList ==========", noList)
-                // * Update Template Block  ends here ======================================================================
-
-
-                const messageBlock = await MessageTemplateModel.findOne({ templateId })
-                console.log("MessageTemplate.findOne() success ====================")
-                console.log(messageBlock)
-
-                let userList = [yesList, noList];
-
-                console.log("userList ===========", userList)
-
-                const message = messageBlock.block;
-
-                console.log(this.updatePattern.test(message));
-                const patternMatch = message.match(this.updatePattern);
-                console.log(patternMatch);
-
-                let updatedMessageBlock = message;
-
-                for (let index = 0; index < patternMatch.length; index++) {
-
-                    const matchString = patternMatch[index];
-                    const replacementString = userList[index] !== undefined ? userList[index] : "";
-                    console.log(index, matchString, replacementString)
-                    updatedMessageBlock = updatedMessageBlock.replace(matchString, replacementString);
-
-                }
-
-                console.log(updatedMessageBlock)
-
-                console.log("block ===================")
-                console.log(typeof block)
+                const updatedMessageBlock = this.#createPollMessage(channelId, templateId, ts)
 
                 const res = await this.web.chat.update({
                     channel: channelId,
@@ -233,23 +191,36 @@ class PollMessage {
     async closeMessage(channelId, templateId, ts) {
         try {
 
+
+            console.log("Before Disabling Poll ============================", channelId, ts)
+            const disabledPoll = await this.#updatePoll(channelId, templateId, ts);
+            console.log("disablePoll Success =============================", disabledPoll)
+
             console.log("Before Updating Message ============================", channelId, ts)
 
-            const disabledPoll = await new PollMessageHistory().updatePollStatus(
-                {
-                    templateId: templateId,
-                    channelId: channelId,
-                    ts: ts
-                },
-                {
-                    active: false
-                }
-            )
+            const updatedMessageBlock = this.#createPollMessage(channelId, templateId, ts)
 
-            console.log("disablePoll Success =============================", disabledPoll)
+            const res = await this.web.chat.update({
+                channel: channelId,
+                ts: ts,
+                as_user: true,
+                blocks: JSON.parse(updatedMessageBlock)
+            })
+            console.log('Message updated: ==============================', res)
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+
+    async #createPollMessage(channelId, templateId, ts) {
+        try {
 
             const responseList = await PollModel.find({ channelId, messageId: ts });
             console.log("Data retrieved", responseList.length, responseList);
+
 
             // * Update Template Block  starts here ======================================================================
             let yesList = [];
@@ -292,27 +263,13 @@ class PollMessage {
 
             console.log("userList ===========", userList)
 
-            const message = JSON.parse(messageBlock.block);
+            const message = messageBlock.block;
 
-
-            console.log(typeof message);
-            console.log(message);
-
-            const closedMessage = JSON.stringify(message
-                .map((_block) => {
-                    delete _block["accessory"]
-                    return _block
-                }))
-
-            console.log(typeof closedMessage);
-            console.log(closedMessage);
-
-
-            console.log(this.updatePattern.test(closedMessage));
-            const patternMatch = closedMessage.match(this.updatePattern);
+            console.log(this.updatePattern.test(message));
+            const patternMatch = message.match(this.updatePattern);
             console.log(patternMatch);
 
-            let updatedMessageBlock = (closedMessage);
+            let updatedMessageBlock = message;
 
             for (let index = 0; index < patternMatch.length; index++) {
 
@@ -323,23 +280,17 @@ class PollMessage {
 
             }
 
-            updatedMessageBlock = updatedMessageBlock.replace("Open", "Closed")
-
             console.log(updatedMessageBlock)
 
-            const res = await this.web.chat.update({
-                channel: channelId,
-                ts: ts,
-                as_user: true,
-                blocks: JSON.parse(updatedMessageBlock)
-            })
-            console.log('Message updated: ==============================', res)
+            console.log("updatedMessageBlock ===================")
+            console.log(typeof updatedMessageBlock)
+
+            return updatedMessageBlock;
 
         } catch (error) {
             console.log(error)
         }
     }
-
 
 }
 
