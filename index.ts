@@ -8,8 +8,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const commandRoutes = require("./slack/commands")
-
-
 import { slackEvents, slackInteraction } from "./new/connections/slackConn"
 
 const app = express();
@@ -27,7 +25,7 @@ const connectionString = process.env.ATLAS_URI;
         })
 
 
-        app.use("/slack/events", slackEvents.requestListener())
+        app.use('/slack/events', slackEvents.requestListener())
         app.use('/slack/interactions', slackInteraction.requestListener())
 
         app.get("/", (_req: Request, res: Response) => {
