@@ -2,7 +2,10 @@ const express = require("express");
 const PollMessageHistoryModel = require("../model/pollMessageHistoryModel");
 const PollMessage = require("../templates/pollMessage");
 const SlackMessage = require("../templates/slackMessage");
+const PollModel = require("./../model/pollModel")
 const commandRoutes = express.Router();
+
+
 
 commandRoutes.post("/dinner_message", async (req, res) => {
     try {
@@ -53,13 +56,6 @@ commandRoutes.post("/friday_feedback_b3a", async (req, res) => {
         const messageRes = await new SlackMessage().sendRichMessage(channel_id, dinnerMessageTemplateId);
         console.log("Message Sent ================== ", messageRes)
 
-        const { templateId, res: richMessageRes } = messageRes;
-
-        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
-        const pollMessageHistoryResponse = await pollMessageHistory.save();
-
-        console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
-
         res.send("Request Completed");
 
     } catch (error) {
@@ -77,13 +73,6 @@ commandRoutes.post("/friday_feedback_b3b", async (req, res) => {
         const dinnerMessageTemplateId = "friday_feedback_b3b"
         const messageRes = await new SlackMessage().sendRichMessage(channel_id, dinnerMessageTemplateId);
         console.log("Message Sent ================== ", messageRes)
-
-        const { templateId, res: richMessageRes } = messageRes;
-
-        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
-        const pollMessageHistoryResponse = await pollMessageHistory.save();
-
-        console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
 
         res.send("Request Completed");
 
@@ -103,19 +92,46 @@ commandRoutes.post("/friday_feedback_b3c", async (req, res) => {
         const messageRes = await new SlackMessage().sendRichMessage(channel_id, dinnerMessageTemplateId);
         console.log("Message Sent ================== ", messageRes)
 
-        const { templateId, res: richMessageRes } = messageRes;
-
-        const pollMessageHistory = new PollMessageHistoryModel({ channelId: channel_id, templateId, ts: richMessageRes.ts })
-        const pollMessageHistoryResponse = await pollMessageHistory.save();
-
-        console.log("PollMessageHistory recorded Successfully ====================", pollMessageHistoryResponse)
-
         res.send("Request Completed");
 
     } catch (error) {
         console.log(error);
     }
 
+})
+
+commandRoutes.post("/appreciation_card_reminder", async () => {
+    try {
+        console.log(req.body)
+
+        const { channel_id } = req.body
+        const messageTemplateId = "appreciation_card_reminder"
+        const messageRes = await new SlackMessage().sendRichMessage(channel_id, messageTemplateId);
+        console.log("Message Sent ================== ", messageRes)
+
+        res.send("Request Completed");
+
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+
+
+//!      Incomplete
+commandRoutes.post("/close_poll", async (req, res) => {
+    try {
+        console.log(req.body);
+        const { channel_id } = req.body
+
+        const recentPoll = await PollModel.find({ channelId: channel_id }).sort({ _id: 1 }).limit(1);
+        console.log(recentPoll);
+
+        res.send("Request Completed close_poll");
+
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 
