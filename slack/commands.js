@@ -100,7 +100,7 @@ commandRoutes.post("/friday_feedback_b3c", async (req, res) => {
 
 })
 
-commandRoutes.post("/appreciation_card_reminder", async () => {
+commandRoutes.post("/appreciation_card_reminder", async (req, res) => {
     try {
         console.log(req.body)
 
