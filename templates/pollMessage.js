@@ -177,7 +177,7 @@ class PollMessage {
                     channel: channelId,
                     ts: ts,
                     as_user: true,
-                    blocks: updatedMessageBlock
+                    blocks: JSON.parse(updatedMessageBlock)
                 })
                 console.log('Message updated: ==============================', res)
             }
