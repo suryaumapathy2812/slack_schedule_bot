@@ -27,7 +27,7 @@ slack_events.on("app_mention", async (event) => {
     console.log("templateId", typeof templateName, templateName);
 
     if (toChannel === null || templateName === null) {
-        await new SlackMessage().sendMessage(fromChannel, "Hi there, I'm zork. \nHow can I help you");
+        await new SlackMessage().sendMessage(fromChannel, "Hi there, I'm zork. \nHow can I help you?");
     } else {
         // await customTemplateMessages(toChannel ?? process.env.DEFAULT_CHANNEL, templateName)
 
