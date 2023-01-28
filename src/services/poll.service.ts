@@ -1,5 +1,5 @@
 import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose"
-import Poll, { PollDocument } from "./../model/Poll.model"
+import Poll, { PollDocument } from "../model/Poll.model"
 
 
 

@@ -1,5 +1,5 @@
 import { FilterQuery, QueryOptions, UpdateQuery } from "mongoose";
-import MessageTemplate, { MessageTemplateDocument } from "./../model/MessageTemplate.model"
+import MessageTemplate, { MessageTemplateDocument } from "../model/MessageTemplate.model"
 
 
 export async function create(input: Object) {

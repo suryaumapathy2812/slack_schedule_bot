@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config()
 }
 
-import { slackEvents, slackInteraction, slackCommand } from "./new/connections/slackConn";
+import { slackEvents, slackInteraction, slackCommand } from "./connections/slackConn";
 
 const app = express();
 const port = process.env.PORT || 3000;

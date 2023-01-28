@@ -15,14 +15,14 @@ commandController.post("/dinner_message", async (req, res) => {
         console.log(messageResponse);
         res.statusMessage = "Message Sent Successfully"
         res.status(200)
-            .send();
+            .send("Message Sent Successfully");
 
     } catch (error) {
 
         console.log(error)
         res.statusMessage = "Failed to Send Message";
         res.status(400)
-            .send()
+            .send("Failed to Send Message")
 
     }
 })
