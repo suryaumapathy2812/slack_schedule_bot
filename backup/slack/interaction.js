@@ -9,8 +9,6 @@ function listenForInteraction(app) {
     app.use('/slack/interactions', slackInteraction.requestListener())
 }
 
-
-
 const { updateSimpleMessage } = require("./../connection/webApi")
 
 slackInteraction.action({ type: 'button' }, async (payload, response) => {

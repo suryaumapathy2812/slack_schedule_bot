@@ -69,10 +69,10 @@ class SlackMessage {
             console.log(error);
         }
 
-
     }
 
 
+    
     async sendRichMessage(channelId, templateName) {
         try {
 

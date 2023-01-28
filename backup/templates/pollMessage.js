@@ -171,13 +171,15 @@ class PollMessage {
                     console.log("updateResponse", updateResponse)
                 }
 
-                const updatedMessageBlock = this.#createPollMessage(channelId, templateId, ts)
+                const updatedMessageBlock = await this.#createPollMessage(channelId, templateId, ts)
+
+                console.log(updatedMessageBlock)
 
                 const res = await this.web.chat.update({
                     channel: channelId,
                     ts: ts,
                     as_user: true,
-                    blocks: updatedMessageBlock
+                    blocks: JSON.parse(updatedMessageBlock)
                 })
                 console.log('Message updated: ==============================', res)
             }
