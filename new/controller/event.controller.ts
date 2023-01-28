@@ -17,7 +17,6 @@ slackEvents.on("app_mention", async (event) => {
 
     //     //  !  send messagePoll
     //     const pollMessage = new PollMessageModel().createMessage(toChannel, templateName)
-
     // }
 
 })
