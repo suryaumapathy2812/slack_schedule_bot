@@ -44,6 +44,8 @@ export class SlackMessage {
             console.log("SlackMessage.sendMessage() success ====================")
             console.log(res.ts);
 
+            return res;
+
         } catch (error) {
             console.log("SlackMessage.sendMessage() failed  ====================")
             console.log(error)
@@ -64,6 +66,8 @@ export class SlackMessage {
 
             console.log("SlackMessage.updateMessage() success ====================")
             console.log(res.ts);
+
+            return res
 
         } catch (error) {
             console.log("SlackMessage.updateMessage() failed ====================")
