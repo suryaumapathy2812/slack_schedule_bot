@@ -14,7 +14,6 @@ const slackWeb = new WebClient(process.env.BOT_USER_OAUTH_TOKEN, {
     logLevel: LogLevel.DEBUG
 });
 
-
 const slackCommand = express.Router();
 
 slackCommand.all("**", commandController)

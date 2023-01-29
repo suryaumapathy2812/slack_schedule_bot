@@ -1,6 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 
-
 export interface MessageTemplateModel {
     templateId: string;
     templateName: string;

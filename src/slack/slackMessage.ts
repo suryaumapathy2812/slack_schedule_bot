@@ -1,15 +1,14 @@
 import { Block, ChatPostMessageArguments, ChatUpdateArguments, KnownBlock, WebClient } from "@slack/client";
 import { slackWeb } from "../connections/slackConn";
-import { Message, Blocks, Elements, Md } from 'slack-block-builder';
+
 
 const default_message = "Hi! This is Zork_dev, looks like someone has forgoten something"
 
-export interface Message {
+export interface Message extends ChatPostMessageArguments {
     channel: string;
-    text?: string;
+    text: string;
     blocks?: (Block | KnownBlock)[];
 }
-
 
 export interface UpdatedMessage extends Message {
     ts: string;
@@ -29,15 +28,14 @@ export class SlackMessage {
     }
 
 
-    async sendMessage(message: Message, options?: MessageOptions) {
+    async sendMessage(message: Message, options?: MessageOptions): Promise<any> {
         try {
 
-            const messageObj: ChatPostMessageArguments = {
-                channel: message.channel,
-                text: message.text ?? default_message,
-            }
+            const messageObj: ChatPostMessageArguments = Object.assign({}, message)
 
-            if (options?.type === "BLOCK") messageObj.blocks = message.blocks
+            console.log(messageObj);
+
+            // if (options?.type === "BLOCK") messageObj.blocks = message.blocks
 
             const res = await this.web.chat.postMessage(messageObj)
 
@@ -53,16 +51,18 @@ export class SlackMessage {
     }
 
 
-    async updateMessage(message: Message, update: UpdatedMessage, options?: MessageOptions) {
+    async updateMessage(message: UpdatedMessage, options?: MessageOptions) {
         try {
 
-            const messageObj: ChatUpdateArguments = {
-                channel: message.channel,
-                ts: update.ts,
-                text: message.text ?? default_message,
-            }
+            // const messageObj: ChatUpdateArguments = {
+            //     channel: message.channel,
+            //     ts: message.ts,
+            //     text: message.text ?? default_message,
+            // }
+            console.log("SlackMessage.updateMessage() Entered ====================")
+            console.log(message)
 
-            const res = await this.web.chat.update(messageObj)
+            const res = await this.web.chat.update(message)
 
             console.log("SlackMessage.updateMessage() success ====================")
             console.log(res.ts);

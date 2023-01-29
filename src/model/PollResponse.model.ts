@@ -6,10 +6,10 @@ export interface PollResponseModel {
     ts: string;
     userId: string;
     username: string;
-    userResponse: string;
+    userResponse: number;
 }
 
-export interface PollResponseDocument extends PollResponseModel, mongoose.Document {
+export interface PollResponseDocument extends PollResponseModel {
     createdAt: Date;
     updatedAt: Date;
 }
