@@ -72,3 +72,31 @@ commandController.post("/dinner_message", function (req, res) { return __awaiter
         }
     });
 }); });
+commandController.post("/create_poll", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var commandService, model, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                console.log("create_poll ========================");
+                console.log(req.body);
+                commandService = new command_service_1.CommandService();
+                return [4 /*yield*/, commandService.createPollModel(req)];
+            case 1:
+                model = _a.sent();
+                console.log(model);
+                res.statusMessage = "Model Opened Successfully";
+                res.status(200)
+                    .send("Model Opened Successfully");
+                return [3 /*break*/, 3];
+            case 2:
+                error_2 = _a.sent();
+                console.log(error_2);
+                res.statusMessage = "Failed to Open modal";
+                res.status(400)
+                    .send("Failed to Open modal");
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });

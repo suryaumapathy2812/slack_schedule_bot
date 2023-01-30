@@ -11,7 +11,6 @@ export class PollService {
 
         try {
 
-
             console.log(data, optional)
 
             const { channelId, question, options } = data

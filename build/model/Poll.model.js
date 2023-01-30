@@ -25,10 +25,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose_1 = __importStar(require("mongoose"));
 var pollSchema = new mongoose_1.Schema({
-    templateId: {
-        type: String,
-        required: true
-    },
     channelId: {
         type: String,
         required: true
@@ -37,10 +33,35 @@ var pollSchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
+    question: {
+        type: String,
+        required: true
+    },
+    options: {
+        type: [{
+                text: { type: String, required: true },
+                value: { type: Number, required: true }
+            }],
+        required: true
+    },
     active: {
         type: Boolean,
         required: true,
         default: true
+    },
+    createdBy: {
+        type: {
+            userId: { type: String, required: true },
+            userName: { type: String, required: true }
+        },
+        required: true
+    },
+    modifiedBy: {
+        type: {
+            userId: { type: String, required: true },
+            userName: { type: String, required: true }
+        },
+        required: true
     }
 }, { timestamps: true });
 exports.default = mongoose_1.default.model('Poll', pollSchema);

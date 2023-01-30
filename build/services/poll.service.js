@@ -39,46 +39,81 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePoll = exports.findOnePoll = exports.createPoll = void 0;
+exports.PollService = void 0;
 var Poll_model_1 = __importDefault(require("../model/Poll.model"));
-function createPoll(input) {
-    return __awaiter(this, void 0, void 0, function () {
-        var poll, db_res;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    poll = new Poll_model_1.default(input);
-                    return [4 /*yield*/, poll.save()];
-                case 1:
-                    db_res = _a.sent();
-                    console.log("Data recorded", db_res);
-                    return [2 /*return*/, db_res];
-            }
+var commonMessages_1 = require("../slack/commonMessages");
+var slackMessage_1 = require("../slack/slackMessage");
+var PollService = /** @class */ (function () {
+    function PollService() {
+    }
+    // async createPoll({ question, options, channelId }, { username, status }) {
+    PollService.prototype.createPoll = function (data, optional) {
+        return __awaiter(this, void 0, void 0, function () {
+            var channelId, question, options, user, status, messageBlock, resp, pollinput, poll, db_res, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        console.log(data, optional);
+                        channelId = data.channelId, question = data.question, options = data.options;
+                        user = optional.user, status = optional.status;
+                        messageBlock = commonMessages_1.CommonMessages.generatePoll({ question: question, options: options }, { username: user.userName, status: true });
+                        return [4 /*yield*/, new slackMessage_1.SlackMessage()
+                                .sendMessage(Object.assign(messageBlock, {
+                                channel: channelId,
+                                text: "Dinner Message"
+                            }), { type: "BLOCK" })];
+                    case 1:
+                        resp = _a.sent();
+                        pollinput = {
+                            channelId: channelId,
+                            question: question,
+                            options: options.map(function (opt) { return { "text": opt.text, "value": opt.value }; }),
+                            active: true,
+                            createdBy: user,
+                            modifiedBy: user,
+                            ts: resp["ts"],
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        };
+                        console.log(pollinput);
+                        poll = new Poll_model_1.default(pollinput);
+                        return [4 /*yield*/, poll.save()];
+                    case 2:
+                        db_res = _a.sent();
+                        console.log("Data recorded", db_res);
+                        return [2 /*return*/, { slack: resp, db: db_res }];
+                    case 3:
+                        error_1 = _a.sent();
+                        console.log(error_1);
+                        return [2 /*return*/, { slack: { status: "falied" }, db: { status: "failed" } }];
+                    case 4: return [2 /*return*/];
+                }
+            });
         });
-    });
-}
-exports.createPoll = createPoll;
-function findOnePoll(query, options) {
-    if (options === void 0) { options = {}; }
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Poll_model_1.default.findOne(query, null, options)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
+    };
+    PollService.prototype.findOnePoll = function (query, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Poll_model_1.default.findOne(query, null, options)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
         });
-    });
-}
-exports.findOnePoll = findOnePoll;
-function updatePoll(filter, update, options) {
-    if (options === void 0) { options = {}; }
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, Poll_model_1.default.findOneAndUpdate(filter, update, options)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
+    };
+    PollService.prototype.updatePoll = function (filter, update, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Poll_model_1.default.findOneAndUpdate(filter, update, options)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
         });
-    });
-}
-exports.updatePoll = updatePoll;
+    };
+    return PollService;
+}());
+exports.PollService = PollService;

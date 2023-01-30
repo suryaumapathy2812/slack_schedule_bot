@@ -39,25 +39,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.slackInteraction = void 0;
 var interactive_messages_1 = require("@slack/interactive-messages");
+var interaction_service_1 = require("../services/interaction.service");
 var signing_secret = "" + (process.env.SLACK_SIGNING_SECRET);
 var slackInteraction = (0, interactive_messages_1.createMessageAdapter)(signing_secret);
 exports.slackInteraction = slackInteraction;
 slackInteraction
     .action({ type: 'button' }, function (payload, response) { return __awaiter(void 0, void 0, void 0, function () {
-    var channelId, ts, userId, username, userResponse;
+    var service, error_1;
     return __generator(this, function (_a) {
-        try {
-            console.log(payload);
-            channelId = payload.channel.id;
-            ts = payload.message.ts;
-            userId = payload.user.id;
-            username = payload.user.username;
-            userResponse = payload.actions[0].value;
-            console.log(channelId, ts, userId, username, userResponse);
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                console.log(payload);
+                return [4 /*yield*/, new interaction_service_1.InteractionService().pollResponse(payload)];
+            case 1:
+                service = _a.sent();
+                console.log(service);
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                console.log(error_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
-        catch (error) {
-            console.log(error);
+    });
+}); });
+slackInteraction
+    .viewSubmission("", function (payload) { return __awaiter(void 0, void 0, void 0, function () {
+    var service, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                console.log(payload);
+                return [4 /*yield*/, new interaction_service_1.InteractionService().viewSubmission(payload)];
+            case 1:
+                service = _a.sent();
+                console.log(service);
+                return [3 /*break*/, 3];
+            case 2:
+                error_2 = _a.sent();
+                console.log(error_2);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
-        return [2 /*return*/];
     });
 }); });

@@ -38,38 +38,64 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandService = void 0;
 var commonMessages_1 = require("../slack/commonMessages");
-var slackMessage_1 = require("../slack/slackMessage");
+var slackModal_1 = require("../slack/slackModal");
+var poll_service_1 = require("./poll.service");
 var CommandService = /** @class */ (function () {
     function CommandService() {
     }
-    CommandService.prototype.dinnerMessage = function (req) {
+    CommandService.prototype.createPollModel = function (req) {
         return __awaiter(this, void 0, void 0, function () {
-            var channelId, messageBlock, messageResp, error_1;
+            var channelId, triggerId, modelBlock, modelResp, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
                         channelId = req.body["channel_id"];
-                        messageBlock = commonMessages_1.CommonMessages.dinnerMessage({
-                            channelId: channelId,
-                            text: "dinner_message",
-                            status: "OPEN"
-                        });
-                        return [4 /*yield*/, new slackMessage_1.SlackMessage()
-                                .sendMessage({
-                                channel: channelId,
-                                text: "Dinner Message",
-                                blocks: messageBlock["blocks"]
-                            }, { type: "BLOCK" })];
+                        triggerId = req.body["trigger_id"];
+                        modelBlock = commonMessages_1.CommonMessages.createPollModel();
+                        console.log(modelBlock);
+                        return [4 /*yield*/, new slackModal_1.SlackModal()
+                                .openModel({
+                                triggerId: triggerId,
+                                view: modelBlock
+                            })];
                     case 1:
-                        messageResp = _a.sent();
-                        return [2 /*return*/, messageResp];
+                        modelResp = _a.sent();
+                        return [2 /*return*/, modelResp];
                     case 2:
                         error_1 = _a.sent();
                         console.log(error_1);
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
+            });
+        });
+    };
+    CommandService.prototype.dinnerMessage = function (req) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user, data, messageResp;
+            return __generator(this, function (_a) {
+                try {
+                    user = {
+                        userId: req.body["user_id"],
+                        userName: req.body["user_name"]
+                    };
+                    data = {
+                        channelId: req.body["channel_id"],
+                        question: "Are you staying back for dinner tonight?",
+                        options: [
+                            { text: "YES", value: 1 },
+                            { text: "NO", value: 2 },
+                        ]
+                    };
+                    messageResp = new poll_service_1.PollService()
+                        .createPoll(data, { user: user, status: true });
+                    return [2 /*return*/, messageResp];
+                }
+                catch (error) {
+                    console.log(error);
+                }
+                return [2 /*return*/];
             });
         });
     };

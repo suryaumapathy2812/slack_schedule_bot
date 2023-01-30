@@ -44,27 +44,22 @@ var SlackMessage = /** @class */ (function () {
         this.web = slackConn_1.slackWeb;
     }
     SlackMessage.prototype.sendMessage = function (message, options) {
-        var _a;
         return __awaiter(this, void 0, void 0, function () {
             var messageObj, res, error_1;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        messageObj = {
-                            channel: message.channel,
-                            text: (_a = message.text) !== null && _a !== void 0 ? _a : default_message,
-                        };
-                        if ((options === null || options === void 0 ? void 0 : options.type) === "BLOCK")
-                            messageObj.blocks = message.blocks;
+                        _a.trys.push([0, 2, , 3]);
+                        messageObj = Object.assign({}, message);
+                        console.log(messageObj);
                         return [4 /*yield*/, this.web.chat.postMessage(messageObj)];
                     case 1:
-                        res = _b.sent();
+                        res = _a.sent();
                         console.log("SlackMessage.sendMessage() success ====================");
                         console.log(res.ts);
                         return [2 /*return*/, res];
                     case 2:
-                        error_1 = _b.sent();
+                        error_1 = _a.sent();
                         console.log("SlackMessage.sendMessage() failed  ====================");
                         console.log(error_1);
                         return [3 /*break*/, 3];
@@ -73,27 +68,23 @@ var SlackMessage = /** @class */ (function () {
             });
         });
     };
-    SlackMessage.prototype.updateMessage = function (message, update, options) {
-        var _a;
+    SlackMessage.prototype.updateMessage = function (message, options) {
         return __awaiter(this, void 0, void 0, function () {
-            var messageObj, res, error_2;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var res, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        messageObj = {
-                            channel: message.channel,
-                            ts: update.ts,
-                            text: (_a = message.text) !== null && _a !== void 0 ? _a : default_message,
-                        };
-                        return [4 /*yield*/, this.web.chat.update(messageObj)];
+                        _a.trys.push([0, 2, , 3]);
+                        console.log("SlackMessage.updateMessage() Entered ====================");
+                        console.log(message);
+                        return [4 /*yield*/, this.web.chat.update(message)];
                     case 1:
-                        res = _b.sent();
+                        res = _a.sent();
                         console.log("SlackMessage.updateMessage() success ====================");
                         console.log(res.ts);
                         return [2 /*return*/, res];
                     case 2:
-                        error_2 = _b.sent();
+                        error_2 = _a.sent();
                         console.log("SlackMessage.updateMessage() failed ====================");
                         console.log(error_2);
                         return [3 /*break*/, 3];
