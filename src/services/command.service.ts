@@ -2,6 +2,7 @@ import { Request } from "express";
 import { CommonMessages } from "../slack/commonMessages";
 import { SlackMessage } from "../slack/slackMessage";
 import { SlackModal } from "../slack/slackModal";
+import { PollService } from "./poll.service";
 
 export class CommandService {
 
@@ -33,24 +34,24 @@ export class CommandService {
 
         try {
 
-            const channelId = req.body["channel_id"];
-            const senderId = req.body["user_name"];
+            const user = {
+                userId: req.body["user_id"],
+                userName: req.body["user_name"]
+            }
 
-            const messageBlock = CommonMessages.dinnerMessage({
-                channelId,
-                senderId: senderId,
-                text: "dinner_message",
-                status: "OPEN"
-            });
+            const data = {
+                channelId: req.body["channel_id"],
+                question: "Are you staying back for dinner tonight?",
+                options: [
+                    { text: "YES", value: 1 },
+                    { text: "NO", value: 2 },
+                ]
+            }
 
-            const messageResp = await new SlackMessage()
-                .sendMessage(
-                    Object.assign(messageBlock, {
-                        channelId: channelId,
-                        text: "Dinner Message",
-                    }),
-                    { type: "BLOCK" }
-                );
+            const messageResp = new PollService()
+                .createPoll(
+                    data, { user, status: true }
+                )
 
             return messageResp
 

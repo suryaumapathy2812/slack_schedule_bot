@@ -60,17 +60,20 @@ export class CommonMessages {
     }
 
 
-    static generatePoll(question: string, options: string[]) {
+    static generatePoll(data: { question: string, options: { text: string; value: number; }[] }, optional: { username: string, status: boolean }) {
 
-        const optionBlock = options.map((option, index) => {
+        const { question, options } = data
+        const { username, status } = optional
+
+        const optionBlock = options.map((option) => {
             return Blocks.Section()
-                .text(`*${index + 1}.* ${option}`)
+                .text(`*${option.value}.* ${option.text} `)
         })
 
-        const optionButtons = options.map((_, index) => {
+        const optionButtons = options.map((option) => {
             return Elements.Button()
-                .value(`${index + 1}`)
-                .text(`${index + 1}`)
+                .value(`${option.value}`)
+                .text(`${option.value}`)
         })
 
         const poll = Message()
@@ -82,7 +85,15 @@ export class CommonMessages {
                     .elements(
                         ...optionButtons
                     ),
-                ...optionBlock
+                ...optionBlock, Blocks.Divider(),
+                Blocks.Context()
+                    .elements(
+                        [
+                            `Sender: ${username} `,
+                            `| `,
+                            `Poll status: ${status ? "open" : "closed"} `
+                        ]
+                    )
             )
             .buildToJSON()
 
@@ -95,7 +106,7 @@ export class CommonMessages {
 
 
         const { question, options, responses } = data;
-        const { username: userId, status } = optional
+        const { username, status } = optional
 
         const totalResponses = responses.length;
 
@@ -108,10 +119,10 @@ export class CommonMessages {
                 .text(`*${option.value}.* ${option.text}  *(${Math.round(resp.length / totalResponses * 100)})*   ${users}`)
         })
 
-        const optionButtons = options.map((_, index) => {
+        const optionButtons = options.map((option) => {
             return Elements.Button()
-                .value(`${index + 1}`)
-                .text(`${index + 1}`)
+                .value(`${option.value}`)
+                .text(`${option.value}`)
         })
 
         const poll = Message()
@@ -128,7 +139,7 @@ export class CommonMessages {
                 Blocks.Context()
                     .elements(
                         [
-                            `Sender: ${userId} `,
+                            `Sender: ${username} `,
                             `| `,
                             `Poll status: ${status ? "open" : "closed"} `
                         ]

@@ -25,40 +25,23 @@ export class InteractionService {
 
             const selectedChannels = channels["selected_channels"]
             const question = Object.values(values.questions)[0]["value"];
-            const options = Object.values(values.options)[0]["value"].split("\n");
+            const options = Object.values(values.options)[0]["value"]
+                .split("\n")
+                .map((val: string, i: number) => { return { text: val, value: i + 1 } });
 
-            const messageBlock = CommonMessages.generatePoll(question, options);
+            // const messageBlock = CommonMessages.generatePoll({ question, options }, { username: user.userName, status: true });
 
             const messageResp = []
 
             for (let i = 0; i < selectedChannels.length; i++) {
 
-                const channel = selectedChannels[i]
+                const resp = await new PollService().createPoll(
+                    { question, options, channelId: selectedChannels[i] }, { user, status: true }
+                )
 
-                const resp = await new SlackMessage()
-                    .sendMessage(
-                        Object.assign(messageBlock, {
-                            channel: channel,
-                            text: "Dinner Message"
-                        }),
-                        { type: "BLOCK" });
+                console.log(resp)
 
-                messageResp.push(resp);
-
-
-                const pollResp = new PollService().createPoll({
-                    channelId: channel,
-                    question: question,
-                    options: options.map((opt: string, i: number) => { return { "text": opt, "value": i + 1 }; }),
-                    active: true,
-                    createdBy: user,
-                    modifiedBy: user,
-                    ts: resp["ts"],
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                })
-
-                console.log(pollResp)
+                messageResp.push(resp)
 
             }
 

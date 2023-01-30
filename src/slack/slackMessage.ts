@@ -54,11 +54,6 @@ export class SlackMessage {
     async updateMessage(message: UpdatedMessage, options?: MessageOptions) {
         try {
 
-            // const messageObj: ChatUpdateArguments = {
-            //     channel: message.channel,
-            //     ts: message.ts,
-            //     text: message.text ?? default_message,
-            // }
             console.log("SlackMessage.updateMessage() Entered ====================")
             console.log(message)
 
