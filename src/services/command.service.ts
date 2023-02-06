@@ -1,6 +1,6 @@
 import { Request } from "express";
+import { Md } from "slack-block-builder";
 import { CommonMessages } from "../slack/commonMessages";
-import { SlackMessage } from "../slack/slackMessage";
 import { SlackModal } from "../slack/slackModal";
 import { PollService } from "./poll.service";
 
@@ -13,6 +13,7 @@ export class CommandService {
             const channelId = req.body["channel_id"];
             const triggerId = req.body["trigger_id"]
 
+            console.log(channelId, triggerId);
 
             const modelBlock = CommonMessages.createPollModel();
             console.log(modelBlock);
@@ -41,7 +42,7 @@ export class CommandService {
 
             const data = {
                 channelId: req.body["channel_id"],
-                question: "Are you staying back for dinner tonight?",
+                question: `${Md.bold("Are you staying back for dinner tonight?")}`,
                 options: [
                     { text: "YES", value: 1 },
                     { text: "NO", value: 2 },
