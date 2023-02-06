@@ -66,7 +66,7 @@ class SlackMessage {
 
         } catch (error) {
             console.log("SlackMessage.updateMessage() failed ====================")
-            console.log(res);
+            console.log(error);
         }
 
     }
