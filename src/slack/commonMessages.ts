@@ -1,4 +1,5 @@
-import { Message, Blocks, Elements, Md, Modal } from 'slack-block-builder';
+import { Message, Blocks, Elements, Md, Modal, SectionBuilder, Section } from 'slack-block-builder';
+import { ProgressBar } from '../utils/progressBar';
 
 export interface DinnerMessageArgs {
     status: "OPEN" | "CLOSE";
@@ -65,15 +66,15 @@ export class CommonMessages {
         const { question, options } = data
         const { username, status } = optional
 
-        const optionBlock = options.map((option) => {
-            return Blocks.Section()
-                .text(`*${option.value}.* ${option.text} `)
-        })
-
         const optionButtons = options.map((option) => {
             return Elements.Button()
                 .value(`${option.value}`)
-                .text(`${option.value}`)
+                .text(`${option.text}`)
+        })
+
+        const optionBlock = options.map((option) => {
+            return Blocks.Section()
+                .text(`*${option.value}.* ${option.text} `)
         })
 
         const poll = Message()
@@ -85,7 +86,8 @@ export class CommonMessages {
                     .elements(
                         ...optionButtons
                     ),
-                ...optionBlock, Blocks.Divider(),
+                // ...optionBlock,
+                Blocks.Divider(),
                 Blocks.Context()
                     .elements(
                         [
@@ -104,44 +106,66 @@ export class CommonMessages {
 
     static updatePoll(data: { question: string, options: { text: string; value: number; }[], responses: any[] }, optional: { username: string, status: boolean }) {
 
+        console.log("=========================================================================")
+        console.log(data, optional)
 
         const { question, options, responses } = data;
         const { username, status } = optional
 
         const totalResponses = responses.length;
+        console.log(totalResponses)
 
         const optionBlock = options.map((option) => {
             const resp = responses.filter(res => (+res.userResponse) === (option.value));
 
             const users = resp.map(r => `@${r.username} `).toString();
 
-            return Blocks.Section()
-                .text(`*${option.value}.* ${option.text}  *(${Math.round(resp.length / totalResponses * 100)})*   ${users}`)
+            return (` 
+                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${resp.length / totalResponses * 100} (${resp.length}) \n\n${users}
+                `)
         })
 
-        const optionButtons = options.map((option) => {
-            return Elements.Button()
-                .value(`${option.value}`)
-                .text(`${option.value}`)
-        })
+        let optionButtons;
+
+        console.log(status)
+
+        if (status) {
+
+            optionButtons = Blocks.Actions()
+                .elements(
+                    ...options.map((option) => {
+                        return Elements.Button()
+                            .value(`${option.value}`)
+                            .text(`${option.text}`)
+                    })
+                )
+
+            console.log(optionButtons)
+            
+        } else {
+            optionButtons = Blocks.Divider()
+            console.log(optionButtons)
+        }
 
         const poll = Message()
             .blocks(
                 Blocks.Section({ text: `@channel \n` }),
                 Blocks.Section()
                     .text(question),
-                Blocks.Actions()
-                    .elements(
-                        ...optionButtons
+                optionButtons,
+                Blocks.Section()
+                    .fields(
+                        ...optionBlock
                     ),
-                ...optionBlock,
                 Blocks.Divider(),
                 Blocks.Context()
                     .elements(
                         [
                             `Sender: ${username} `,
                             `| `,
-                            `Poll status: ${status ? "open" : "closed"} `
+                            `Poll status: ${status ? "open" : "closed"} `,
+                            `| `,
+                            `Reponses: ${totalResponses}`
                         ]
                     )
             )
@@ -158,7 +182,6 @@ export class CommonMessages {
                 Blocks.Section({ text: `@channel \n` }),
                 Blocks.Section({ text: `${Md.bold("Are you staying back for dinner :knife_fork_plate: tonight?")} \n` }),
                 Blocks.Divider(),
-
                 Blocks.Section()
                     .text("YES")
                     .accessory(
