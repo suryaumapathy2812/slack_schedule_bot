@@ -4,7 +4,7 @@
   "description": "",
   "main": "./build/index.js",
   "scripts": {
-    "prestart": "npm run install",
+    "prestart": "npm install",
     "build": "rimraf ./build && npx tsc",
     "start:dev": "npx nodemon",
     "start": "npm run build && node build/index.js"
