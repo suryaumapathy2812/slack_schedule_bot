@@ -64,5 +64,9 @@ export class PollService {
         return await Poll.findOneAndUpdate(filter, update, options)
     }
 
+    async closePoll(filter: FilterQuery<PollDocument>, options: QueryOptions = {}) {
+        return await Poll.findOneAndUpdate(filter, { active: false }, options)
+    }
+
 
 }
