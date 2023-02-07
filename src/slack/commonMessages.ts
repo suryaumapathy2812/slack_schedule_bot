@@ -1,4 +1,6 @@
-import { Message, Blocks, Elements, Md, Modal, SectionBuilder, Section } from 'slack-block-builder';
+import { Message, Blocks, Elements, Md, Modal, Button } from 'slack-block-builder';
+import { PollDocument } from '../model/Poll.model';
+import { PollResponseDocument } from '../model/PollResponse.model';
 import { ProgressBar } from '../utils/progressBar';
 
 export interface DinnerMessageArgs {
@@ -121,7 +123,7 @@ export class CommonMessages {
             const users = resp.map(r => `@${r.username} `).toString();
 
             return (` 
-                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${resp.length / totalResponses * 100} (${resp.length}) \n\n${users}
+                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${Math.round(resp.length / totalResponses * 100)} (${resp.length}) \n\n${users}
                 `)
         })
 
@@ -212,5 +214,71 @@ export class CommonMessages {
 
         return JSON.parse(message);
     }
+
+
+    static app_home_mention(polls: PollDocument[]) {
+
+        const pollBlock = (poll: PollDocument, pollResponses?: PollResponseDocument[]) => {
+
+            const { channelId, active, createdBy } = poll;
+            const { question, options } = poll
+
+            const optionsString = options.map(_opt => `${Md.bold(_opt.text)}`).toString().replace(",", " \n")
+
+            const section = Blocks.Section()
+                .text(`*#${channelId}*\n ${question} \n\n ${optionsString}`)
+                .accessory(
+                    Elements.Button()
+                        .text("Close Poll")
+                        .value("close_poll")
+                        .danger()
+                )
+
+            const context = Blocks.Context()
+                .elements([
+                    `Sender : ${createdBy.userName}`,
+                    `|`,
+                    `status : ${active ? "open" : "closed"}`,
+                    `|`,
+                    `Responses : `
+                ])
+
+            const divider = Blocks.Divider()
+
+            return [section, context, divider]
+
+        }
+
+        const pollBlockList = polls.map(poll => pollBlock(poll))
+
+        const block = Message()
+            .blocks(
+                Blocks.Header()
+                    .text("Hi there! My name is Zork"),
+                Blocks.Actions()
+                    .elements(
+                        Button()
+                            .text("Create New Poll")
+                            .value("create_poll")
+                            .primary()
+                    ),
+                Blocks.Section()
+                    .text("*Your Polls*"),
+                Blocks.Divider(),
+                ...pollBlockList
+
+            )
+            .buildToJSON()
+
+        return JSON.parse(block)
+
+    }
+    // static fridayFeedback() {
+    //     const message: string = Message()
+    //         .blocks(
+    //     )
+    //         .buildToJSON()
+    //     return JSON.parse(message)
+    // }
 
 }

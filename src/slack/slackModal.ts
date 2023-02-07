@@ -41,4 +41,21 @@ export class SlackModal {
         }
     }
 
+    async slackView(model: any) {
+        try {
+
+            const modelObj: any = {
+                view: model.view,
+                user_id: model.user
+            }
+
+            const res = await this.web.views.publish(modelObj)
+
+            return res;
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 }

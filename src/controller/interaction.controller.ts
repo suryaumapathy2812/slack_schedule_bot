@@ -2,9 +2,6 @@
 
 import { createMessageAdapter } from "@slack/interactive-messages";
 import { InteractionService } from "../services/interaction.service";
-import { PollService } from "../services/poll.service";
-import { PollResponseService } from "../services/PollResponse.service";
-import { SlackMessage } from "../slack/slackMessage";
 
 const signing_secret = "" + (process.env.SLACK_SIGNING_SECRET)
 const slackInteraction = createMessageAdapter(signing_secret);
