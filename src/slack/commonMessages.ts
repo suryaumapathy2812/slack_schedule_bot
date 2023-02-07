@@ -123,7 +123,7 @@ export class CommonMessages {
             const users = resp.map(r => `@${r.username} `).toString();
 
             return (` 
-                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${resp.length / totalResponses * 100} (${resp.length}) \n\n${users}
+                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${Math.round(resp.length / totalResponses * 100)} (${resp.length}) \n\n${users}
                 `)
         })
 
