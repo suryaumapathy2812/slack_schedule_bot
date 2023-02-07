@@ -59,7 +59,6 @@ export class PollService {
         return await Poll.findOne(query, null, options)
     }
 
-
     async updatePoll(filter: FilterQuery<PollDocument>, update: UpdateQuery<PollDocument>, options: QueryOptions = {}) {
         return await Poll.findOneAndUpdate(filter, update, options)
     }
@@ -67,6 +66,25 @@ export class PollService {
     async closePoll(filter: FilterQuery<PollDocument>, options: QueryOptions = {}) {
         return await Poll.findOneAndUpdate(filter, { active: false }, options)
     }
+
+
+    async findAllPolls(filter: FilterQuery<PollDocument> = {}, options: QueryOptions = {}) {
+        const filterCondition = Object.assign({ active: true, filter })
+        return await Poll.find(filterCondition, options);
+    }
+
+    // ! User poles
+
+    async findAllUserPolls(filter: FilterQuery<PollDocument>, options: QueryOptions = {}) {
+        return await Poll.find(filter, options);
+    }
+
+
+    async findAllActiveUserPolls(filter: FilterQuery<PollDocument>, options: QueryOptions = {}) {
+        const filterCondition = Object.assign({ active: true, filter })
+        return await Poll.find(filterCondition, options);
+    }
+
 
 
 }

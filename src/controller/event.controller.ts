@@ -1,6 +1,7 @@
 // import { slackEvents } from "./../connections/slackConn"
 
 import { createEventAdapter } from "@slack/events-api";
+import { EventService } from "../services/event.service";
 
 
 const signing_secret = "" + (process.env.SLACK_SIGNING_SECRET)
@@ -26,6 +27,30 @@ slackEvents.on("app_mention", async (event) => {
     // }
 
 })
+
+
+
+slackEvents.on("app_home_opened", async (event) => {
+    console.log("Event triggered :  app_home_opened ")
+    console.log(event);
+
+    // {
+    //     type: 'app_home_opened',
+    //         user: 'U03P09REPUK',
+    //             channel: 'D04MCA5794H',
+    //                 tab: 'messages',
+    //                     event_ts: '1675733509.785199'
+    // }
+
+
+    const { user: userId, channel } = event;
+
+    const eventService = new EventService();
+    eventService.appHomeMention(userId, channel)
+
+
+})
+
 
 
 export { slackEvents }
