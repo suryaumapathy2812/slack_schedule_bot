@@ -2,6 +2,7 @@ import { Message, Blocks, Elements, Md, Modal, Button } from 'slack-block-builde
 import { PollDocument } from '../model/Poll.model';
 import { PollResponseDocument } from '../model/PollResponse.model';
 import { ProgressBar } from '../utils/progressBar';
+import { Channel } from './channel';
 
 export interface DinnerMessageArgs {
     status: "OPEN" | "CLOSE";
@@ -27,10 +28,15 @@ export class CommonMessages {
                     .label("Channel(s)")
                     .optional(false)
                     .element(
-                        Elements.ChannelMultiSelect()
+                        Elements.ConversationMultiSelect()
                             .maxSelectedItems(5)
-                            .focusOnLoad(false)
+                            .focusOnLoad(true)
                             .placeholder("Where should the poll be sent?"),
+                    ),
+
+                Blocks.Context()
+                    .elements(
+                        `*Note*: Integrate ${Md.bold("Zork")} in the above channels before sending the Poll, else you will not be receving the Polls`
                     ),
 
                 Blocks.Input()
@@ -54,6 +60,8 @@ export class CommonMessages {
                             .multiline(true)
                             .maxLength(1000)
                     ),
+
+
 
 
             )
@@ -216,17 +224,19 @@ export class CommonMessages {
     }
 
 
-    static app_home_mention(polls: PollDocument[]) {
+    static async app_home_mention(polls: PollDocument[]) {
 
-        const pollBlock = (poll: PollDocument, pollResponses?: PollResponseDocument[]) => {
+        const pollBlock = async (poll: PollDocument, pollResponses?: PollResponseDocument[]) => {
 
             const { channelId, active, createdBy } = poll;
             const { question, options } = poll
 
             const optionsString = options.map(_opt => `${Md.bold(_opt.text)}`).toString().replace(",", " \n")
 
+            const channelName = await new Channel().getName(channelId)
+
             const section = Blocks.Section()
-                .text(`*#${channelId}*\n ${question} \n\n ${optionsString}`)
+                .text(`*#${channelName}*\n ${question} \n\n ${optionsString}`)
                 .accessory(
                     Elements.Button()
                         .text("Close Poll")
@@ -249,7 +259,11 @@ export class CommonMessages {
 
         }
 
-        const pollBlockList = polls.map(poll => pollBlock(poll))
+        const _pollBlockList = polls.map(async (poll) => await pollBlock(poll))
+
+        const pollBlockList: any[] = await Promise.all(_pollBlockList);
+
+        console.log(pollBlockList);
 
         const block = Message()
             .blocks(
@@ -267,12 +281,15 @@ export class CommonMessages {
                 Blocks.Divider(),
                 ...pollBlockList
 
+
             )
             .buildToJSON()
 
         return JSON.parse(block)
 
     }
+
+
     // static fridayFeedback() {
     //     const message: string = Message()
     //         .blocks(

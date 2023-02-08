@@ -174,9 +174,11 @@ slackInteraction
         try {
             console.log(payload);
 
-            const service = await new InteractionService().viewSubmission(payload)
+            const service = await new InteractionService().viewSubmission(payload);
 
             console.log(service);
+
+            
 
         } catch (error) {
             console.log(error)

@@ -16,6 +16,7 @@ export class EventService {
                 userId: userId
             }
         }
+
         const userPolls = await new PollService()
             .findAllPolls(filter);
 

@@ -11,7 +11,8 @@ export interface Modal {
             text: string
         };
         blocks: (Block | KnownBlock)[];
-    }
+    },
+    user?: string
 }
 
 

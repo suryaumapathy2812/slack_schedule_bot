@@ -1,7 +1,7 @@
-
-import { AnyKindOfDictionary } from "lodash";
 import { View } from "../controller/interaction.controller";
+import { Bot } from "../slack/bot";
 import { CommonMessages } from "../slack/commonMessages";
+import { Conversations } from "../slack/conversation";
 import { SlackMessage } from "../slack/slackMessage";
 import { PollService } from "./poll.service"
 import { PollResponseService } from "./PollResponse.service";
@@ -13,6 +13,11 @@ export class InteractionService {
 
         try {
 
+            console.log(payload)
+
+            const bot = await new Bot().info()
+            console.log(bot)
+
             const user = {
                 userId: payload.user.id,
                 userName: payload.user.username
@@ -23,7 +28,7 @@ export class InteractionService {
 
             const channels = Object.values(values.channels)[0];
 
-            const selectedChannels = channels["selected_channels"]
+            const selectedChannels = channels["selected_conversations"]
             const question = Object.values(values.questions)[0]["value"];
             const options = Object.values(values.options)[0]["value"]
                 .split("\n")
@@ -35,13 +40,18 @@ export class InteractionService {
 
             for (let i = 0; i < selectedChannels.length; i++) {
 
-                const resp = await new PollService().createPoll(
-                    { question, options, channelId: selectedChannels[i] }, { user, status: true }
-                )
+                const channelId = selectedChannels[i];
+                const isPart = await new Conversations().isPart(channelId, process.env.BOT_ID ?? "")
 
-                console.log(resp)
-
-                messageResp.push(resp)
+                if (isPart) {
+                    const resp = await new PollService().createPoll(
+                        { question, options, channelId: channelId }, { user, status: true }
+                    )
+                    console.log(resp)
+                    messageResp.push(resp)
+                } else {
+                    messageResp.push({ slack: { status: "falied", reason: "Bot not part of the Conversation" }, db: { status: "failed" } })
+                }
 
             }
 

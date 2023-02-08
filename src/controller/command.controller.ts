@@ -37,7 +37,8 @@ commandController.post("/create_poll", async (req, res) => {
         const model = await commandService.createPollModel(req);
 
         console.log(model);
-        res.statusMessage = "Model Opened Successfully"
+
+        res.statusMessage = "Model Opened Successfully";
         res.status(200)
             .send("Model Opened Successfully");
 
