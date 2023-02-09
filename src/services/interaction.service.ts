@@ -77,6 +77,7 @@ export class InteractionService {
             const username = payload.user.username;
             const userResponse = payload.actions[0].value;
 
+            const pollResponseService = new PollResponseService()
             const poll = await new PollService()
                 .findOnePoll(
                     {
@@ -93,10 +94,7 @@ export class InteractionService {
             if (poll.active === false) {
                 console.log("Poll is closed, Sorry !!!")
                 console.log(poll)
-                return poll;
             } else {
-
-                const pollResponseService = new PollResponseService()
 
                 console.log("Before Updating Message ============================", channelId, ts, userId, username, userResponse)
 
@@ -148,26 +146,70 @@ export class InteractionService {
 
                 }
 
-                const question = poll.question;
-                const options = poll.options;
-                const responses = await pollResponseService.findAllResponses({
-                    channelId,
-                    ts,
-                })
-
-                const updatedMessageBlock = await CommonMessages
-                    .updatePoll({ question, options, responses }, { username, status: poll.active });
-
-                const messsageUpdateResp = await new SlackMessage().updateMessage({
-                    channel: channelId,
-                    ts,
-                    text: "",
-                    blocks: updatedMessageBlock["blocks"]
-                })
-
-                return messsageUpdateResp
-
             }
+
+            const question = poll.question;
+            const options = poll.options;
+            const responses = await pollResponseService.findAllResponses({
+                channelId,
+                ts,
+            })
+
+            const updatedMessageBlock = await CommonMessages
+                .updatePoll({ question, options, responses }, { username, status: poll.active });
+
+            const messsageUpdateResp = await new SlackMessage().updateMessage({
+                channel: channelId,
+                ts,
+                text: question,
+                blocks: updatedMessageBlock["blocks"]
+            })
+
+            return messsageUpdateResp
+
+
+        } catch (error) {
+            console.log(error)
+            return error
+        }
+
+    }
+
+    async closePoll(payload: any) {
+
+        try {
+
+            const { block_id } = payload.actions[0];
+            const ts = JSON.parse(block_id)
+
+            const pollService = new PollService()
+            const poll = await pollService.closePoll({ ts: ts, active: true });
+
+            console.log(poll)
+
+            const channelId: any = poll?.channelId
+            const question: any = poll?.question
+            const options: any = poll?.options
+            const user: any = poll?.createdBy
+            const status: any = poll?.active
+
+            const responses = await new PollResponseService().findAllResponses({
+                ts,
+            })
+
+            const updatedMessageBlock = await CommonMessages
+                .updatePoll({ question, options, responses }, { username: user.userName, status });
+
+            console.log(updatedMessageBlock)
+
+            const messsageUpdateResp = await new SlackMessage().updateMessage({
+                channel: channelId,
+                ts,
+                text: "",
+                blocks: updatedMessageBlock["blocks"]
+            })
+
+            console.log(messsageUpdateResp)
 
         } catch (error) {
             console.log(error)

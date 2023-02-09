@@ -14,7 +14,7 @@ export interface DinnerMessageArgs {
 
 export class CommonMessages {
 
-    static createPollModel() {
+    static createPollModal() {
         const model: string = Modal()
             .title("Zork")
             .submit("Submit")
@@ -78,14 +78,15 @@ export class CommonMessages {
 
         const optionButtons = options.map((option) => {
             return Elements.Button()
+                .actionId("poll_input_" + option.value)
                 .value(`${option.value}`)
                 .text(`${option.text}`)
         })
 
-        const optionBlock = options.map((option) => {
-            return Blocks.Section()
-                .text(`*${option.value}.* ${option.text} `)
-        })
+        // const optionBlock = options.map((option) => {
+        //     return Blocks.Section()
+        //         .text(`*${option.value}.* ${option.text} `)
+        // })
 
         const poll = Message()
             .blocks(
@@ -93,6 +94,7 @@ export class CommonMessages {
                 Blocks.Section()
                     .text(question),
                 Blocks.Actions()
+                    .blockId("poll_inputs")
                     .elements(
                         ...optionButtons
                     ),
@@ -142,9 +144,11 @@ export class CommonMessages {
         if (status) {
 
             optionButtons = Blocks.Actions()
+                .blockId("poll_inputs")
                 .elements(
                     ...options.map((option) => {
                         return Elements.Button()
+                            .actionId("poll_input_" + option.value)
                             .value(`${option.value}`)
                             .text(`${option.text}`)
                     })
@@ -228,7 +232,7 @@ export class CommonMessages {
 
         const pollBlock = async (poll: PollDocument, pollResponses?: PollResponseDocument[]) => {
 
-            const { channelId, active, createdBy } = poll;
+            const { channelId, active, createdBy, ts } = poll;
             const { question, options } = poll
 
             const optionsString = options.map(_opt => `${Md.bold(_opt.text)}`).toString().replace(",", " \n")
@@ -236,9 +240,11 @@ export class CommonMessages {
             const channelName = await new Channel().getName(channelId)
 
             const section = Blocks.Section()
+                .blockId(JSON.stringify(ts))
                 .text(`*#${channelName}*\n ${question} \n\n ${optionsString}`)
                 .accessory(
                     Elements.Button()
+                        .actionId("close_poll")
                         .text("Close Poll")
                         .value("close_poll")
                         .danger()
@@ -290,6 +296,66 @@ export class CommonMessages {
     }
 
 
+    static createLinkModal() {
+        const model: string = Modal()
+            .title("Zork")
+            .submit("Submit")
+            .close("Cancel")
+            .blocks(
+                Blocks.Header()
+                    .text("Let's start creating your poll"),
+
+                Blocks.Input()
+                    .blockId("channels")
+                    .label("Channel(s)")
+                    .optional(false)
+                    .element(
+                        Elements.ConversationMultiSelect()
+                            .maxSelectedItems(5)
+                            .focusOnLoad(true)
+                            .placeholder("Where should the poll be sent?"),
+                    ),
+
+                Blocks.Context()
+                    .elements(
+                        `*Note*: Integrate ${Md.bold("Zork")} in the above channels before sending the Poll, else you will not be receving the Polls`
+                    ),
+
+                Blocks.Input()
+                    .blockId("message")
+                    .label("Message")
+                    .optional(false)
+                    .element(
+                        Elements.TextInput()
+                            .placeholder("Write your message...")
+                            .multiline(true)
+                            .maxLength(1000)
+                    ),
+
+                Blocks.Input()
+                    .label("URL")
+                    .optional(false)
+                    .element(
+                        Elements.URLInput()
+                            .placeholder("Paste your link here...")
+                    ),
+
+                Blocks.Actions()
+                    .blockId("add_link_input")
+                    .elements(
+                        Elements.Button()
+                            .text("Add Another Link")
+                            .accessibilityLabel("Add another link")
+                            .value("add_link_input")
+                            .primary()
+                            .actionId("add_link_input")
+                    )
+
+            )
+            .buildToJSON()
+
+        return JSON.parse(model);
+    }
     // static fridayFeedback() {
     //     const message: string = Message()
     //         .blocks(

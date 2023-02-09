@@ -52,4 +52,28 @@ commandController.post("/create_poll", async (req, res) => {
 })
 
 
+commandController.post("/create_link", async (req, res) => {
+    try {
+
+        console.log("create_poll ========================");
+        console.log(req.body)
+
+        const commandService = new CommandService();
+        const model = await commandService.createLinkModal(req);
+
+        console.log(model);
+
+        res.statusMessage = "Model Opened Successfully";
+        res.status(200)
+            .send("Model Opened Successfully");
+
+
+    } catch (error) {
+        console.log(error)
+        res.statusMessage = "Failed to Open modal";
+        res.status(400)
+            .send("Failed to Open modal")
+    }
+})
+
 export { commandController };

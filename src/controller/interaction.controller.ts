@@ -1,6 +1,7 @@
 // import { slackInteraction } from "./../connections/slackConn"
 
-import { createMessageAdapter } from "@slack/interactive-messages";
+import { ActionHandler, createMessageAdapter } from "@slack/interactive-messages";
+import { EventService } from "../services/event.service";
 import { InteractionService } from "../services/interaction.service";
 
 const signing_secret = "" + (process.env.SLACK_SIGNING_SECRET)
@@ -154,8 +155,17 @@ export declare module View {
 
 
 
+
 slackInteraction
-    .action({ type: 'button' }, async (payload, response) => {
+    .action({ type: "button", blockId: "add_link_input", actionId: "add_link_input" }, async (payload) => {
+
+        console.log("Entered Block Action Interaction ==================================================");
+        console.log(payload);
+
+    })
+
+slackInteraction
+    .action({ type: 'button', blockId: "poll_inputs" }, async (payload, response) => {
         try {
             console.log(payload);
 
@@ -169,6 +179,27 @@ slackInteraction
 
     })
 
+
+slackInteraction
+    .action({ type: 'button', actionId: "close_poll" }, async (payload, response) => {
+        try {
+            console.log(payload);
+
+            const userId = payload.user.id
+
+            const service = await new InteractionService().closePoll(payload);
+            console.log(service)
+
+            const viewSubmission = await new EventService().appHomeMention(userId, "")
+            console.log(viewSubmission);
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    })
+
+
 slackInteraction
     .viewSubmission("", async (payload: View.ViewSubmission) => {
         try {
@@ -178,13 +209,10 @@ slackInteraction
 
             console.log(service);
 
-            
-
         } catch (error) {
             console.log(error)
         }
 
     })
-
 
 export { slackInteraction }

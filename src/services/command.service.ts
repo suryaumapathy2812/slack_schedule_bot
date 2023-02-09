@@ -15,7 +15,7 @@ export class CommandService {
 
             console.log(channelId, triggerId);
 
-            const modelBlock = CommonMessages.createPollModel();
+            const modelBlock = await CommonMessages.createPollModal();
             console.log(modelBlock);
 
             const modelResp = await new SlackModal()
@@ -61,5 +61,28 @@ export class CommandService {
         }
     }
 
+    async createLinkModal(req: Request<any>) {
+        try {
+
+            const channelId = req.body["channel_id"];
+            const triggerId = req.body["trigger_id"]
+
+            console.log(channelId, triggerId);
+
+            const modelBlock = CommonMessages.createLinkModal();
+            console.log(modelBlock);
+
+            const modelResp = await new SlackModal()
+                .openModel({
+                    triggerId,
+                    view: modelBlock
+                })
+
+            return modelResp;
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 }
