@@ -154,25 +154,19 @@ export declare module View {
 }
 
 
-
-
 slackInteraction
     .action({ type: "button", blockId: "add_link_input", actionId: "add_link_input" }, async (payload) => {
-
         console.log("Entered Block Action Interaction ==================================================");
         console.log(payload);
-
     })
+
 
 slackInteraction
     .action({ type: 'button', blockId: "poll_inputs" }, async (payload, response) => {
         try {
             console.log(payload);
-
             const service = await new InteractionService().pollResponse(payload);
-
             console.log(service)
-
         } catch (error) {
             console.log(error)
         }
@@ -184,15 +178,11 @@ slackInteraction
     .action({ type: 'button', actionId: "close_poll" }, async (payload, response) => {
         try {
             console.log(payload);
-
             const userId = payload.user.id
-
             const service = await new InteractionService().closePoll(payload);
             console.log(service)
-
             const viewSubmission = await new EventService().appHomeMention(userId, "")
             console.log(viewSubmission);
-
         } catch (error) {
             console.log(error)
         }
@@ -204,11 +194,8 @@ slackInteraction
     .viewSubmission("", async (payload: View.ViewSubmission) => {
         try {
             console.log(payload);
-
             const service = await new InteractionService().viewSubmission(payload);
-
             console.log(service);
-
         } catch (error) {
             console.log(error)
         }

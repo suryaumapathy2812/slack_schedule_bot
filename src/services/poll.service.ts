@@ -70,7 +70,7 @@ export class PollService {
 
     async findAllPolls(filter: FilterQuery<PollDocument> = {}, options: QueryOptions = {}) {
         const filterCondition = Object.assign({ active: true, filter })
-        return await Poll.find(filterCondition, options);
+        return await Poll.find(filterCondition, options).sort({ "createdAt": "desc" });
     }
 
     // ! User poles

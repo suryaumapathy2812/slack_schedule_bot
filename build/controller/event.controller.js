@@ -39,21 +39,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.slackEvents = void 0;
 var events_api_1 = require("@slack/events-api");
+var event_service_1 = require("../services/event.service");
 var signing_secret = "" + (process.env.SLACK_SIGNING_SECRET);
 var slackEvents = (0, events_api_1.createEventAdapter)(signing_secret);
 exports.slackEvents = slackEvents;
 slackEvents.on("app_mention", function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var fromChannel, message, _a, toChannel, templateName;
-    return __generator(this, function (_b) {
+    return __generator(this, function (_a) {
         console.log("Received an app_mention event from user ".concat(event.user, " in channel ").concat(event.channel));
         console.log(event);
-        fromChannel = event.channel, message = event.text;
-        _a = messagePatternRecognize(message), toChannel = _a.channel, templateName = _a.template;
-        console.log("toChannel", typeof toChannel, toChannel);
-        console.log("templateId", typeof templateName, templateName);
         return [2 /*return*/];
     });
 }); });
-function messagePatternRecognize(message) {
-    throw new Error("Function not implemented.");
-}
+slackEvents.on("app_home_opened", function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, channel, eventService;
+    return __generator(this, function (_a) {
+        console.log("Event triggered :  app_home_opened ");
+        console.log(event);
+        userId = event.user, channel = event.channel;
+        eventService = new event_service_1.EventService();
+        eventService.appHomeMention(userId, channel);
+        return [2 /*return*/];
+    });
+}); });

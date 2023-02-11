@@ -36,60 +36,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SlackModal = void 0;
+exports.Bot = void 0;
 var slackConn_1 = require("../connections/slackConn");
-var SlackModal = /** @class */ (function () {
-    function SlackModal() {
+var Bot = /** @class */ (function () {
+    function Bot() {
+        var _a;
         this.web = slackConn_1.slackWeb;
+        this.id = (_a = process.env.BOT_ID) !== null && _a !== void 0 ? _a : "";
     }
-    SlackModal.prototype.openModel = function (model) {
+    Bot.prototype.info = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var modelObj, res, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        modelObj = {
-                            trigger_id: model.triggerId,
-                            view: model.view,
-                        };
-                        return [4 /*yield*/, this.web.views.open(modelObj)];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res];
-                    case 2:
-                        error_1 = _a.sent();
-                        console.log(error_1);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                    case 0: return [4 /*yield*/, this.web.bots.info({ bot: this.id })];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    SlackModal.prototype.slackView = function (model) {
-        return __awaiter(this, void 0, void 0, function () {
-            var modelObj, res, error_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        modelObj = {
-                            view: model.view,
-                            user_id: model.user
-                        };
-                        return [4 /*yield*/, this.web.views.publish(modelObj)];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res];
-                    case 2:
-                        error_2 = _a.sent();
-                        console.log(error_2);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return SlackModal;
+    return Bot;
 }());
-exports.SlackModal = SlackModal;
+exports.Bot = Bot;

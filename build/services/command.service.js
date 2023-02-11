@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandService = void 0;
+var slack_block_builder_1 = require("slack-block-builder");
 var commonMessages_1 = require("../slack/commonMessages");
 var slackModal_1 = require("../slack/slackModal");
 var poll_service_1 = require("./poll.service");
@@ -49,24 +50,27 @@ var CommandService = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        _a.trys.push([0, 3, , 4]);
                         channelId = req.body["channel_id"];
                         triggerId = req.body["trigger_id"];
-                        modelBlock = commonMessages_1.CommonMessages.createPollModel();
+                        console.log(channelId, triggerId);
+                        return [4 /*yield*/, commonMessages_1.CommonMessages.createPollModal()];
+                    case 1:
+                        modelBlock = _a.sent();
                         console.log(modelBlock);
                         return [4 /*yield*/, new slackModal_1.SlackModal()
                                 .openModel({
                                 triggerId: triggerId,
                                 view: modelBlock
                             })];
-                    case 1:
+                    case 2:
                         modelResp = _a.sent();
                         return [2 /*return*/, modelResp];
-                    case 2:
+                    case 3:
                         error_1 = _a.sent();
                         console.log(error_1);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
@@ -82,7 +86,7 @@ var CommandService = /** @class */ (function () {
                     };
                     data = {
                         channelId: req.body["channel_id"],
-                        question: "Are you staying back for dinner tonight?",
+                        question: "".concat(slack_block_builder_1.Md.bold("Are you staying back for dinner tonight?")),
                         options: [
                             { text: "YES", value: 1 },
                             { text: "NO", value: 2 },
@@ -96,6 +100,35 @@ var CommandService = /** @class */ (function () {
                     console.log(error);
                 }
                 return [2 /*return*/];
+            });
+        });
+    };
+    CommandService.prototype.createLinkModal = function (req) {
+        return __awaiter(this, void 0, void 0, function () {
+            var channelId, triggerId, modelBlock, modelResp, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        channelId = req.body["channel_id"];
+                        triggerId = req.body["trigger_id"];
+                        console.log(channelId, triggerId);
+                        modelBlock = commonMessages_1.CommonMessages.createLinkModal();
+                        console.log(modelBlock);
+                        return [4 /*yield*/, new slackModal_1.SlackModal()
+                                .openModel({
+                                triggerId: triggerId,
+                                view: modelBlock
+                            })];
+                    case 1:
+                        modelResp = _a.sent();
+                        return [2 /*return*/, modelResp];
+                    case 2:
+                        error_2 = _a.sent();
+                        console.log(error_2);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
             });
         });
     };

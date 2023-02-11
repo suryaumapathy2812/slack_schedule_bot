@@ -39,12 +39,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.slackInteraction = void 0;
 var interactive_messages_1 = require("@slack/interactive-messages");
+var event_service_1 = require("../services/event.service");
 var interaction_service_1 = require("../services/interaction.service");
 var signing_secret = "" + (process.env.SLACK_SIGNING_SECRET);
 var slackInteraction = (0, interactive_messages_1.createMessageAdapter)(signing_secret);
 exports.slackInteraction = slackInteraction;
 slackInteraction
-    .action({ type: 'button' }, function (payload, response) { return __awaiter(void 0, void 0, void 0, function () {
+    .action({ type: "button", blockId: "add_link_input", actionId: "add_link_input" }, function (payload) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        console.log("Entered Block Action Interaction ==================================================");
+        console.log(payload);
+        return [2 /*return*/];
+    });
+}); });
+slackInteraction
+    .action({ type: 'button', blockId: "poll_inputs" }, function (payload, response) { return __awaiter(void 0, void 0, void 0, function () {
     var service, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -65,8 +74,34 @@ slackInteraction
     });
 }); });
 slackInteraction
+    .action({ type: 'button', actionId: "close_poll" }, function (payload, response) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, service, viewSubmission, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                console.log(payload);
+                userId = payload.user.id;
+                return [4 /*yield*/, new interaction_service_1.InteractionService().closePoll(payload)];
+            case 1:
+                service = _a.sent();
+                console.log(service);
+                return [4 /*yield*/, new event_service_1.EventService().appHomeMention(userId, "")];
+            case 2:
+                viewSubmission = _a.sent();
+                console.log(viewSubmission);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                console.log(error_2);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); });
+slackInteraction
     .viewSubmission("", function (payload) { return __awaiter(void 0, void 0, void 0, function () {
-    var service, error_2;
+    var service, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -78,8 +113,8 @@ slackInteraction
                 console.log(service);
                 return [3 /*break*/, 3];
             case 2:
-                error_2 = _a.sent();
-                console.log(error_2);
+                error_3 = _a.sent();
+                console.log(error_3);
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }

@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InteractionService = void 0;
 var commonMessages_1 = require("../slack/commonMessages");
+var conversation_1 = require("../slack/conversation");
 var slackMessage_1 = require("../slack/slackMessage");
 var poll_service_1 = require("./poll.service");
 var PollResponse_service_1 = require("./PollResponse.service");
@@ -45,60 +46,71 @@ var InteractionService = /** @class */ (function () {
     function InteractionService() {
     }
     InteractionService.prototype.viewSubmission = function (payload) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var user, view, values, channels, selectedChannels, question, options, messageResp, i, resp, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var user, values, channels, selectedChannels, question, options, messageResp, i, channelId, isPart, resp, error_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 5, , 6]);
+                        _b.trys.push([0, 7, , 8]);
+                        console.log(payload);
                         user = {
                             userId: payload.user.id,
                             userName: payload.user.username
                         };
-                        view = payload.view;
-                        values = view.state.values;
+                        values = payload.view.state.values;
                         channels = Object.values(values.channels)[0];
-                        selectedChannels = channels["selected_channels"];
+                        selectedChannels = channels["selected_conversations"];
                         question = Object.values(values.questions)[0]["value"];
                         options = Object.values(values.options)[0]["value"]
                             .split("\n")
                             .map(function (val, i) { return { text: val, value: i + 1 }; });
                         messageResp = [];
                         i = 0;
-                        _a.label = 1;
+                        _b.label = 1;
                     case 1:
-                        if (!(i < selectedChannels.length)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, new poll_service_1.PollService().createPoll({ question: question, options: options, channelId: selectedChannels[i] }, { user: user, status: true })];
+                        if (!(i < selectedChannels.length)) return [3 /*break*/, 6];
+                        channelId = selectedChannels[i];
+                        return [4 /*yield*/, new conversation_1.Conversations().isPart(channelId, (_a = process.env.BOT_ID) !== null && _a !== void 0 ? _a : "")];
                     case 2:
-                        resp = _a.sent();
-                        console.log(resp);
-                        messageResp.push(resp);
-                        _a.label = 3;
+                        isPart = _b.sent();
+                        if (!isPart) return [3 /*break*/, 4];
+                        return [4 /*yield*/, new poll_service_1.PollService().createPoll({ question: question, options: options, channelId: channelId }, { user: user, status: true })];
                     case 3:
+                        resp = _b.sent();
+                        messageResp.push(resp);
+                        return [3 /*break*/, 5];
+                    case 4:
+                        messageResp.push({ slack: { status: "failed", reason: "Bot not part of the Conversation" }, db: { status: "failed" } });
+                        _b.label = 5;
+                    case 5:
                         i++;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/, { status: "SUCCESS", code: 200, messageResp: messageResp }];
-                    case 5:
-                        error_1 = _a.sent();
+                    case 6:
+                        console.log(messageResp);
+                        return [2 /*return*/, { status: "SUCCESS", code: 200, messageResp: messageResp }];
+                    case 7:
+                        error_1 = _b.sent();
                         console.log(error_1);
                         return [2 /*return*/, { status: "FAILED", code: 400, error: error_1 }];
-                    case 6: return [2 /*return*/];
+                    case 8: return [2 /*return*/];
                 }
             });
         });
     };
     InteractionService.prototype.pollResponse = function (payload) {
         return __awaiter(this, void 0, void 0, function () {
-            var channelId, ts, userId, username, userResponse, poll, pollResponseService, pollResponse, storeRecord, response, question, options, responses, updatedMessageBlock, messsageUpdateResp, error_2;
+            var channelId, ts, userId, username, userResponse, pollResponseService, poll, pollResponse, storeRecord, response, question, options, responses, updatedMessageBlock, messsageUpdateResp, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 12, , 13]);
+                        _a.trys.push([0, 11, , 12]);
                         channelId = payload.channel.id;
                         ts = payload.message.ts;
                         userId = payload.user.id;
                         username = payload.user.username;
                         userResponse = payload.actions[0].value;
+                        pollResponseService = new PollResponse_service_1.PollResponseService();
                         return [4 /*yield*/, new poll_service_1.PollService()
                                 .findOnePoll({
                                 channelId: channelId,
@@ -113,9 +125,8 @@ var InteractionService = /** @class */ (function () {
                         if (!(poll.active === false)) return [3 /*break*/, 2];
                         console.log("Poll is closed, Sorry !!!");
                         console.log(poll);
-                        return [2 /*return*/, poll];
+                        return [3 /*break*/, 7];
                     case 2:
-                        pollResponseService = new PollResponse_service_1.PollResponseService();
                         console.log("Before Updating Message ============================", channelId, ts, userId, username, userResponse);
                         return [4 /*yield*/, pollResponseService
                                 .findOneMessage({
@@ -172,18 +183,73 @@ var InteractionService = /** @class */ (function () {
                         return [4 /*yield*/, new slackMessage_1.SlackMessage().updateMessage({
                                 channel: channelId,
                                 ts: ts,
-                                text: "",
+                                text: question,
                                 blocks: updatedMessageBlock["blocks"]
                             })];
                     case 10:
                         messsageUpdateResp = _a.sent();
                         return [2 /*return*/, messsageUpdateResp];
-                    case 11: return [3 /*break*/, 13];
-                    case 12:
+                    case 11:
                         error_2 = _a.sent();
                         console.log(error_2);
-                        return [3 /*break*/, 13];
-                    case 13: return [2 /*return*/];
+                        return [2 /*return*/, error_2];
+                    case 12: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    InteractionService.prototype.closePoll = function (payload) {
+        return __awaiter(this, void 0, void 0, function () {
+            var block_id, ts, pollService, closePoll, poll, channelId, question, options, user, status, responses, updatedMessageBlock, messsageUpdateResp, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 6, , 7]);
+                        block_id = payload.actions[0].block_id;
+                        ts = JSON.parse(block_id);
+                        pollService = new poll_service_1.PollService();
+                        return [4 /*yield*/, pollService.closePoll({ ts: ts, active: true })];
+                    case 1:
+                        closePoll = _a.sent();
+                        return [4 /*yield*/, pollService.findOnePoll({ ts: ts })];
+                    case 2:
+                        poll = _a.sent();
+                        console.log(poll);
+                        if (!poll) {
+                            throw new Error("Poll not found");
+                        }
+                        channelId = poll.channelId;
+                        question = poll.question;
+                        options = poll.options;
+                        user = poll.createdBy;
+                        status = poll.active;
+                        console.log("========================================================");
+                        console.log(channelId, question, options, user, status);
+                        console.log("========================================================");
+                        return [4 /*yield*/, new PollResponse_service_1.PollResponseService().findAllResponses({
+                                ts: ts,
+                            })];
+                    case 3:
+                        responses = _a.sent();
+                        return [4 /*yield*/, commonMessages_1.CommonMessages.updatePoll({ question: question, options: options, responses: responses }, { username: user.userName, status: status })];
+                    case 4:
+                        updatedMessageBlock = _a.sent();
+                        console.log(updatedMessageBlock);
+                        return [4 /*yield*/, new slackMessage_1.SlackMessage().updateMessage({
+                                channel: channelId,
+                                ts: ts,
+                                text: "This Poll is Closed",
+                                blocks: updatedMessageBlock["blocks"]
+                            })];
+                    case 5:
+                        messsageUpdateResp = _a.sent();
+                        console.log(messsageUpdateResp);
+                        return [3 /*break*/, 7];
+                    case 6:
+                        error_3 = _a.sent();
+                        console.log(error_3);
+                        return [3 /*break*/, 7];
+                    case 7: return [2 /*return*/];
                 }
             });
         });

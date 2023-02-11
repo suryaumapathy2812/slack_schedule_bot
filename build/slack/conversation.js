@@ -36,60 +36,49 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SlackModal = void 0;
+exports.Conversations = void 0;
 var slackConn_1 = require("../connections/slackConn");
-var SlackModal = /** @class */ (function () {
-    function SlackModal() {
+var Conversations = /** @class */ (function () {
+    function Conversations() {
         this.web = slackConn_1.slackWeb;
     }
-    SlackModal.prototype.openModel = function (model) {
+    Conversations.prototype.members = function (channelId) {
         return __awaiter(this, void 0, void 0, function () {
-            var modelObj, res, error_1;
+            var _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _b = (_a = console).log;
+                        return [4 /*yield*/, this.web.conversations.info({ channel: channelId })];
+                    case 1:
+                        _b.apply(_a, [_c.sent()]);
+                        return [2 /*return*/, this.web.conversations.members({ channel: channelId })];
+                }
+            });
+        });
+    };
+    Conversations.prototype.isPart = function (channelId, userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var conversationMembers, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        modelObj = {
-                            trigger_id: model.triggerId,
-                            view: model.view,
-                        };
-                        return [4 /*yield*/, this.web.views.open(modelObj)];
+                        console.log(channelId, userId);
+                        return [4 /*yield*/, this.members(channelId)];
                     case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res];
+                        conversationMembers = _a.sent();
+                        console.log(conversationMembers);
+                        return [2 /*return*/, true];
                     case 2:
                         error_1 = _a.sent();
                         console.log(error_1);
-                        return [3 /*break*/, 3];
+                        return [2 /*return*/, false];
                     case 3: return [2 /*return*/];
                 }
             });
         });
     };
-    SlackModal.prototype.slackView = function (model) {
-        return __awaiter(this, void 0, void 0, function () {
-            var modelObj, res, error_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        modelObj = {
-                            view: model.view,
-                            user_id: model.user
-                        };
-                        return [4 /*yield*/, this.web.views.publish(modelObj)];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res];
-                    case 2:
-                        error_2 = _a.sent();
-                        console.log(error_2);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return SlackModal;
+    return Conversations;
 }());
-exports.SlackModal = SlackModal;
+exports.Conversations = Conversations;

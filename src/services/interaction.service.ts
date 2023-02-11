@@ -15,16 +15,12 @@ export class InteractionService {
 
             console.log(payload)
 
-            const bot = await new Bot().info()
-            console.log(bot)
-
             const user = {
                 userId: payload.user.id,
                 userName: payload.user.username
             }
 
-            const view = payload.view
-            const values = view.state.values
+            const { values } = payload.view.state
 
             const channels = Object.values(values.channels)[0];
 
@@ -47,13 +43,14 @@ export class InteractionService {
                     const resp = await new PollService().createPoll(
                         { question, options, channelId: channelId }, { user, status: true }
                     )
-                    console.log(resp)
                     messageResp.push(resp)
                 } else {
-                    messageResp.push({ slack: { status: "falied", reason: "Bot not part of the Conversation" }, db: { status: "failed" } })
+                    messageResp.push({ slack: { status: "failed", reason: "Bot not part of the Conversation" }, db: { status: "failed" } })
                 }
 
             }
+
+            console.log(messageResp)
 
             return { status: "SUCCESS", code: 200, messageResp };
 
@@ -183,29 +180,41 @@ export class InteractionService {
             const ts = JSON.parse(block_id)
 
             const pollService = new PollService()
-            const poll = await pollService.closePoll({ ts: ts, active: true });
+            const closePoll = await pollService.closePoll({ ts: ts, active: true });
+
+            const poll = await pollService.findOnePoll({ ts: ts })
 
             console.log(poll)
 
-            const channelId: any = poll?.channelId
-            const question: any = poll?.question
-            const options: any = poll?.options
-            const user: any = poll?.createdBy
-            const status: any = poll?.active
+            if (!poll) {
+                throw new Error("Poll not found")
+            }
+
+            const channelId: any = poll.channelId
+            const question: any = poll.question
+            const options: any = poll.options
+            const user: any = poll.createdBy
+            const status: any = poll.active
+
+
+            console.log("========================================================")
+            console.log(channelId, question, options, user, status)
+            console.log("========================================================")
 
             const responses = await new PollResponseService().findAllResponses({
                 ts,
             })
 
-            const updatedMessageBlock = await CommonMessages
-                .updatePoll({ question, options, responses }, { username: user.userName, status });
+            const updatedMessageBlock = await CommonMessages.updatePoll(
+                { question, options, responses }, { username: user.userName, status }
+            );
 
             console.log(updatedMessageBlock)
 
             const messsageUpdateResp = await new SlackMessage().updateMessage({
                 channel: channelId,
                 ts,
-                text: "",
+                text: "This Poll is Closed",
                 blocks: updatedMessageBlock["blocks"]
             })
 

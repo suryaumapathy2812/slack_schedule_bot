@@ -114,6 +114,58 @@ var PollService = /** @class */ (function () {
             });
         });
     };
+    PollService.prototype.closePoll = function (filter, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Poll_model_1.default.findOneAndUpdate(filter, { active: false }, options)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    PollService.prototype.findAllPolls = function (filter, options) {
+        if (filter === void 0) { filter = {}; }
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            var filterCondition;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        filterCondition = Object.assign({ active: true, filter: filter });
+                        return [4 /*yield*/, Poll_model_1.default.find(filterCondition, options).sort({ "createdAt": "desc" })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    // ! User poles
+    PollService.prototype.findAllUserPolls = function (filter, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, Poll_model_1.default.find(filter, options)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    PollService.prototype.findAllActiveUserPolls = function (filter, options) {
+        if (options === void 0) { options = {}; }
+        return __awaiter(this, void 0, void 0, function () {
+            var filterCondition;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        filterCondition = Object.assign({ active: true, filter: filter });
+                        return [4 /*yield*/, Poll_model_1.default.find(filterCondition, options)];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
     return PollService;
 }());
 exports.PollService = PollService;

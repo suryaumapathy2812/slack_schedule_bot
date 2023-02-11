@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Message, Blocks, Elements, Md, Modal, Button } from 'slack-block-builder';
 import { PollDocument } from '../model/Poll.model';
 import { PollResponseDocument } from '../model/PollResponse.model';
@@ -46,7 +47,7 @@ export class CommonMessages {
                     .element(
                         Elements.TextInput()
                             .placeholder("Write your question...")
-                            .multiline(false)
+                            .multiline(true)
                             .maxLength(1000)
                     ),
 
@@ -121,7 +122,8 @@ export class CommonMessages {
         console.log("=========================================================================")
         console.log(data, optional)
 
-        const { question, options, responses } = data;
+        const { question, options } = data;
+        const responses = data.responses ?? []
         const { username, status } = optional
 
         const totalResponses = responses.length;
@@ -132,8 +134,10 @@ export class CommonMessages {
 
             const users = resp.map(r => `@${r.username} `).toString();
 
+            const length = resp.length ?? 0;
+
             return (` 
-                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(resp.length))} | ${Math.round(resp.length / totalResponses * 100)} (${resp.length}) \n\n${users}
+                ${option.text} \n\n${Md.codeInline(ProgressBar.generateProgressBar(length))} | ${Math.round(resp.length / totalResponses * 100)} (${resp.length}) \n\n${users}
                 `)
         })
 
@@ -228,12 +232,38 @@ export class CommonMessages {
     }
 
 
-    static async app_home_mention(polls: PollDocument[]) {
+    static async app_home_mention_loading(userName: string) {
+        const message = Message()
+            .blocks(
+                Blocks.Header()
+                    .text(`Hi @${userName} :wave:`),
+                Blocks.Divider(),
+                Blocks.Section()
+                    .text("If your are in the mood to create a new Poll then :point_right:")
+                    .accessory(
+                        Elements.Button()
+                            .text("Create new poll")
+                            .primary()
+                            .actionId("create_poll")
+                            .value("create_poll"),
+                    ),
+                // Blocks.Divider(),
+                Blocks.Header()
+                    .text("Here are some of the recent Poll that you created"),
+                Blocks.Section()
+                    .text(":cyclone: Loading....")
+            )
+            .buildToJSON()
+
+        return JSON.parse(message);
+    }
+
+    static async app_home_mention(userName: string, polls: PollDocument[]) {
 
         const pollBlock = async (poll: PollDocument, pollResponses?: PollResponseDocument[]) => {
 
             const { channelId, active, createdBy, ts } = poll;
-            const { question, options } = poll
+            const { question, options, createdAt } = poll
 
             const optionsString = options.map(_opt => `${Md.bold(_opt.text)}`).toString().replace(",", " \n")
 
@@ -241,7 +271,7 @@ export class CommonMessages {
 
             const section = Blocks.Section()
                 .blockId(JSON.stringify(ts))
-                .text(`*#${channelName}*\n ${question} \n\n ${optionsString}`)
+                .text(` \n${question} \n\n${optionsString}`)
                 .accessory(
                     Elements.Button()
                         .actionId("close_poll")
@@ -252,11 +282,15 @@ export class CommonMessages {
 
             const context = Blocks.Context()
                 .elements([
-                    `Sender : ${createdBy.userName}`,
+                    `Sender : @${createdBy.userName}`,
                     `|`,
-                    `status : ${active ? "open" : "closed"}`,
+                    `Channel: #${channelName}`,
+                    `| `,
+                    `Status : ${active ? "open" : "closed"}`,
                     `|`,
-                    `Responses : `
+                    `On : ${moment(createdAt).format('MMM Do, h:mm a')}`
+                    // `|`,
+                    // `Responses : `
                 ])
 
             const divider = Blocks.Divider()
@@ -269,21 +303,23 @@ export class CommonMessages {
 
         const pollBlockList: any[] = await Promise.all(_pollBlockList);
 
-        console.log(pollBlockList);
-
         const block = Message()
             .blocks(
                 Blocks.Header()
-                    .text("Hi there! My name is Zork"),
-                Blocks.Actions()
-                    .elements(
-                        Button()
-                            .text("Create New Poll")
-                            .value("create_poll")
-                            .primary()
-                    ),
+                    .text(`Hi @${userName} :wave:`),
+                Blocks.Divider(),
                 Blocks.Section()
-                    .text("*Your Polls*"),
+                    .text("If your are in the mood to create a new Poll then :point_right:")
+                    .accessory(
+                        Elements.Button()
+                            .text("Create new poll")
+                            .primary()
+                            .actionId("create_poll")
+                            .value("create_poll"),
+                    ),
+                // Blocks.Divider(),
+                Blocks.Header()
+                    .text("Here are some of the recent Poll that you created"),
                 Blocks.Divider(),
                 ...pollBlockList
 
