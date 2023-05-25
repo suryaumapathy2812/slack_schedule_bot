@@ -4,5 +4,5 @@
     ],
     "ext": ".js",
     "ignore": [],
-    "exec": "node ./build/index.js"
+    "exec": "node ./build/index.js --inspect-brk"
 }

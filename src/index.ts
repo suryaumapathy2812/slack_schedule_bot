@@ -30,7 +30,7 @@ const connectionString = process.env.ATLAS_URI || "";
             res.send("Server is working")
         })
 
-        app.use("/start", (_req, res) => {
+        app.use("/start", (_req: Request, res: Response) => {
             res.send("Server is working")
         })
 

@@ -9,7 +9,7 @@
     "start": "npm run build && node build/index.js",
     "dev": "concurrently -n tsc-watch,nodemon-watch \"npm run tsc-watch\"  \"npm run start:dev\"",
     "start:dev": "npx nodemon --config nodemon.dev.json",
-    "tsc-watch": "tsc -p ./tsconfig.dev.json -w"
+    "tsc-watch": "tsc -p ./tsconfig.dev.json -w"    
   },
   "keywords": [],
   "author": "",
